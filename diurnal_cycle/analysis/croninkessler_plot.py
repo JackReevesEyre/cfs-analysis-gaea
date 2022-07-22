@@ -1,5 +1,6 @@
 import xarray as xr
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 def main():
@@ -56,9 +57,11 @@ def ck_plot(dso, dsa):
     axs.tick_params(axis='y', which='both', left=True, right=True)
     
     # Add ocean data.
+    bounds = np.linspace(26.5, 27.5, 11)
+    norm = mpl.colors.BoundaryNorm(boundaries=bounds, ncolors=256, extend='both')
     x2d, y2d = np.meshgrid(dso['hour'], dso['st_ocean'], indexing='ij')
     pcm = axs.pcolormesh(x2d, y2d, dso['temp'], shading='nearest',
-                         cmap='RdBu_r')
+                         cmap='RdBu_r', norm=norm)
     plt.colorbar(pcm, location='right')
     dso_base = dso.sel(st_ocean=25.0)
     axs.quiver(x2d, y2d, dso['u'] - dso_base['u'], 
