@@ -49,7 +49,7 @@ def ck_plot(dso, dsa):
     fig, axs = plt.subplots(1,1, figsize=(5,8))
     axs.set_title(lat_str + ' ' + lon_str, loc='left', pad=30)
     axs.set_xlim(-0.5, 23.5)
-    axs.set_ylim(25.0, 0.0)
+    axs.set_ylim(26.0, 0.0)
     axs.set_xlabel('time (UTC)')
     axs.set_ylabel('depth (m)')
     axs.tick_params(axis='x', which='both', bottom=True, top=True)
@@ -57,19 +57,22 @@ def ck_plot(dso, dsa):
     
     # Add ocean data.
     x2d, y2d = np.meshgrid(dso['hour'], dso['st_ocean'], indexing='ij')
-    axs.pcolormesh(x2d, y2d, dso['temp'], shading='nearest')
-    axs.quiver(x2d, y2d, dso['u'], dso['v'])
+    pcm = axs.pcolormesh(x2d, y2d, dso['temp'], shading='nearest',
+                         cmap='RdBu_r')
+    plt.colorbar(pcm, location='right')
+    dso_base = dso.sel(st_ocean=25.0)
+    axs.quiver(x2d, y2d, dso['u'] - dso_base['u'], 
+               dso['v'] - dso_base['v'])
     
     # Add atmo data.
-    axs.quiver(dsa['hour'], -5.0, dsa['UGRD'], dsa['VGRD'])
+    axs.quiver(dsa['hour'], -1.0, dsa['UGRD'], dsa['VGRD'])
     import pdb; pdb.set_trace()
 
     # Save file.
-    plotdir = '/ncrc/home2/Jack.Reeveseyre/plots/diurnal_cycle/'
+    plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
     plotfn = 'croninkessler_plot_' + lat_str + '_' + lon_str + '.'
     plotfileformat='pdf'
-    plt.savefig(plotdir + plotfn + plotfileformat, format=plotfileformat,
-                dpi=500)
+    plt.savefig(plotdir + plotfn + plotfileformat, format=plotfileformat)
     return
 
 
