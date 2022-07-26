@@ -48,9 +48,11 @@ def ck_plot(dso, dsa):
     
     # Change hour to local time.
     hours_ahead = np.around(dsa['lon'].data/15.0)
-    dsa = dsa.assign_coords(hour=((dsa.hour + hours_ahead) % 24))
-    dso = dso.assign_coords(hour=((dso.hour + hours_ahead) % 24))
-    
+    #dsa = dsa.assign_coords(hour=((dsa.hour + hours_ahead) % 24))
+    #dso = dso.assign_coords(hour=((dso.hour + hours_ahead) % 24))
+    dsa = dsa.roll(hour=int(hours_ahead), roll_coords=False)
+    dso = dso.roll(hour=int(hours_ahead), roll_coords=False)
+
     # Set up figure.
     fig, axs = plt.subplots(1,1, figsize=(6,4))
     axs.set_title(lat_str + ' ' + lon_str, loc='left', pad=30)
@@ -79,8 +81,8 @@ def ck_plot(dso, dsa):
                dso['v'] - dso_base['v'])
     
     # Add atmo data.
-    axs.quiver(dsa['hour'], -1.0, dsa['UGRD'], dsa['VGRD'])
-    import pdb; pdb.set_trace()
+    axs.quiver(dsa['hour'], -1.0*xr.ones_like(dsa['hour']), 
+               dsa['UGRD'], dsa['VGRD'])
 
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
