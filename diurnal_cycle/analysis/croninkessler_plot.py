@@ -90,7 +90,7 @@ def ck_plot(dso, dsa):
     axw.set_ylim(0.0, 1.0)
     axw.quiver(dsa['hour'], 0.5*xr.ones_like(dsa['hour']), 
                dsa['UGRD'], dsa['VGRD'],
-               scale=10,scale_units='x',
+               units='inches', scale=10,scale_units='x',
                linewidths=0.025, headlength=3, headaxislength=3)
 
     # Save file.
