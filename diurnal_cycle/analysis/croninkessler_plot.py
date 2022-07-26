@@ -91,7 +91,7 @@ def ck_plot(dso, dsa):
     axw.quiver(dsa['hour'], 0.5*xr.ones_like(dsa['hour']), 
                dsa['UGRD'], dsa['VGRD'],
                scale=10,scale_units='x',
-               linewidths=0.25, headlength=3, headaxislength=3)
+               linewidths=0.025, headlength=3, headaxislength=3)
 
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
