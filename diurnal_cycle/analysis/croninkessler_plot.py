@@ -78,18 +78,19 @@ def ck_plot(dso, dsa):
     x2d, y2d = np.meshgrid(dso['hour'], dso['st_ocean'], indexing='ij')
     pcm = axs.pcolormesh(x2d, y2d, dso['temp'], shading='nearest',
                          cmap='RdBu_r', norm=norm)
-    plt.colorbar(pcm, location='right')
+    plt.colorbar(pcm, location='right', label='temperature (deg C)')
     dso_base = dso.sel(st_ocean=25.0)
     axs.quiver(x2d, y2d, dso['u'] - dso_base['u'], 
                dso['v'] - dso_base['v'])
     
     # Add atmo data.
-    axw = fig.add_subplot(gs[0,0])
+    axw = fig.add_subplot(gs[0,0], sharex=axs)
     axw.axis('off')
     axw.set_xlim(axs.get_xlim())
     axw.set_ylim(0.0, 1.0)
     axw.quiver(dsa['hour'], 0.5*xr.ones_like(dsa['hour']), 
-               dsa['UGRD'], dsa['VGRD'])
+               dsa['UGRD'], dsa['VGRD'],
+               linewidths=0.75, headlength=3, headaxislength=3)
 
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
