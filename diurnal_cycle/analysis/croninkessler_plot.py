@@ -90,8 +90,8 @@ def ck_plot(dso, dsa):
     axw.set_ylim(0.0, 1.0)
     axw.quiver(dsa['hour'], 0.5*xr.ones_like(dsa['hour']), 
                dsa['UGRD'], dsa['VGRD'],
-               units='inches', scale=5, scale_units='x',
-               width=0.01, headlength=3, headaxislength=3)
+               units='inches', scale=7, scale_units='x',
+               width=0.015, headlength=3, headaxislength=3)
 
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
