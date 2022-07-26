@@ -2,6 +2,7 @@ import xarray as xr
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 def main():
     
@@ -53,8 +54,10 @@ def ck_plot(dso, dsa):
     dsa = dsa.roll(hour=int(hours_ahead), roll_coords=False)
     dso = dso.roll(hour=int(hours_ahead), roll_coords=False)
 
-    # Set up figure.
-    fig, axs = plt.subplots(1,1, figsize=(6,4), clip_on=False)
+    # Set up main figure.
+    fig = plt.figure(figsize=(6,4))
+    gs = GridSpec(2, 1, height_ratios=[1,10], hspace=0.0)
+    axs = fig.add_subplot(gs[1,0])
     axs.set_title(lat_str + ' ' + lon_str, loc='left', pad=20)
     axs.set_xlim(-0.5, 23.5)
     ymin = 0.0
@@ -81,7 +84,11 @@ def ck_plot(dso, dsa):
                dso['v'] - dso_base['v'])
     
     # Add atmo data.
-    axs.quiver(dsa['hour'], 0.0*xr.ones_like(dsa['hour']), 
+    axw = fig.add_subplot(gs[0,0])
+    axw.axis('off')
+    axw.set_xlim(axs.get_xlim())
+    axw.set_ylim(0.0, 1.0)
+    axw.quiver(dsa['hour'], 0.5*xr.ones_like(dsa['hour']), 
                dsa['UGRD'], dsa['VGRD'])
 
     # Save file.
