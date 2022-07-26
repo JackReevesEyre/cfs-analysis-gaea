@@ -14,7 +14,7 @@ def main():
             .chunk({'time':48}).mean(dim='time').sel(height=10.0)
     ds_ocean = xr.open_mfdataset(ddir + "ocn_*_meanDiurnalCycle.nc")\
             .chunk({'time':48}).mean(dim='time')
-
+    
     # Loop over locations and plot.
     for i in range(latlon_pairs.shape[0]): 
         ck_plot(ds_ocean.sel(yt_ocean=latlon_pairs[i,0],
@@ -46,19 +46,30 @@ def ck_plot(dso, dsa):
     else:
         lon_str = "{:.1f}".format(dso['lon'].data) + 'E'
     
+    # Change hour to local time.
+    hours_ahead = np.around(dsa['lon'].data/15.0)
+    dsa = dsa.assign_coords(hour=((dsa.hour + hours_ahead) % 24))
+    dso = dso.assign_coords(hour=((dso.hour + hours_ahead) % 24))
+    
     # Set up figure.
-    fig, axs = plt.subplots(1,1, figsize=(5,8))
+    fig, axs = plt.subplots(1,1, figsize=(6,4))
     axs.set_title(lat_str + ' ' + lon_str, loc='left', pad=30)
     axs.set_xlim(-0.5, 23.5)
-    axs.set_ylim(26.0, 0.0)
-    axs.set_xlabel('time (UTC)')
+    ymin = 0.0
+    ymax = 26.0
+    axs.set_ylim(ymax, ymin)
+    axs.set_xlabel('time (local)')
     axs.set_ylabel('depth (m)')
     axs.tick_params(axis='x', which='both', bottom=True, top=True)
     axs.tick_params(axis='y', which='both', left=True, right=True)
     
-    # Add ocean data.
-    bounds = np.linspace(26.5, 27.5, 11)
+    # Work out color scale.
+    col_min = dso['temp'].sel(st_ocean=slice(ymin, ymax)).min()
+    col_max = dso['temp'].sel(st_ocean=slice(ymin, ymax)).max()
+    bounds = np.linspace(np.floor(col_min*10.0)/10.0, 
+                         np.ceil(col_max*10.0)/10.0, 11)
     norm = mpl.colors.BoundaryNorm(boundaries=bounds, ncolors=256, extend='both')
+    # Add ocean data.
     x2d, y2d = np.meshgrid(dso['hour'], dso['st_ocean'], indexing='ij')
     pcm = axs.pcolormesh(x2d, y2d, dso['temp'], shading='nearest',
                          cmap='RdBu_r', norm=norm)
