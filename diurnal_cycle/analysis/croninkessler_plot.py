@@ -81,7 +81,7 @@ def ck_plot(dso, dsa):
                dso['v'] - dso_base['v'])
     
     # Add atmo data.
-    axs.quiver(dsa['hour'], -1.0*xr.ones_like(dsa['hour']), 
+    axs.quiver(dsa['hour'], 0.0*xr.ones_like(dsa['hour']), 
                dsa['UGRD'], dsa['VGRD'])
 
     # Save file.
