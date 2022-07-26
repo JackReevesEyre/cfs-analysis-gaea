@@ -54,8 +54,8 @@ def ck_plot(dso, dsa):
     dso = dso.roll(hour=int(hours_ahead), roll_coords=False)
 
     # Set up figure.
-    fig, axs = plt.subplots(1,1, figsize=(6,4))
-    axs.set_title(lat_str + ' ' + lon_str, loc='left', pad=30)
+    fig, axs = plt.subplots(1,1, figsize=(6,4), clip_on=False)
+    axs.set_title(lat_str + ' ' + lon_str, loc='left', pad=20)
     axs.set_xlim(-0.5, 23.5)
     ymin = 0.0
     ymax = 26.0
