@@ -115,7 +115,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
                          cmap='RdBu_r', norm=tnorm)
     plt.colorbar(pcm, location='bottom', extend='both',
                  shrink=0.5, pad=0.2, 
-                 anchor=(0.0,1.0), panchor=(0.05, 0.0),
+                 panchor=(0.0,1.0), anchor=(0.05, 0.0),
                  label='temperature anomaly (' + r'$^{\circ}$' + 'C)')
 
     # Plot velocity data.
@@ -131,17 +131,14 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
                        levels=clevels,
                        cmap='PuOr', norm=unorm,
                        linewidths=0.7, linestyles=cltypes)
-    contf = axs.contourf(x2d, y2d, dso_anom['U_streamwise'],
-                         levels=clevels,
-                         cmap='PuOr', norm=unorm, alpha=0) 
     axs.contour(x2d, y2d, dso_anom['U_streamwise'],
                 levels=[0], colors=['k'], 
                 linewidths=0.7, linestyles=['dashed'])
     axs.clabel(cont, np.array([-3, -2, -1, 1, 2, 3]), fmt='%d', 
                fontsize=7.0, colors='k')
-    plt.colorbar(contf, location='bottom', extend='both',
-                 shrink=0.5, pad=0.2, alpha=1.0,
-                 anchor=(0.0,1.0), panchor=(0.55, 0.0),
+    plt.colorbar(cont, location='bottom', extend='both',
+                 shrink=0.5, pad=0.2,
+                 panchor=(0.0,1.0), anchor=(0.55, 0.0),
                  label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
     
     # Move the original axes to give a bit more space.
