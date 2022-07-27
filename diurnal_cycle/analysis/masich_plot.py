@@ -91,9 +91,9 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
 
     # Set up main figure.
     fig = plt.figure(figsize=(6,4))
-    axs = fig.add_subplot(1,1,1, position=[0.05, 0.25, 0.9, 0.7])
-    axs.set_title(lat_str + ' ' + lon_str, loc='left', pad=20)
-    axs.set_title(month, loc='right', pad=20)
+    axs = fig.add_subplot(1,1,1)
+    axs.set_title(lat_str + ' ' + lon_str, loc='left')
+    axs.set_title(month, loc='right')
     axs.set_xlim(-0.5, 23.5)
     ymin = 0.0
     ymax = max_depth
@@ -102,8 +102,6 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     axs.set_ylabel('depth (m)')
     axs.tick_params(axis='x', which='both', bottom=True, top=True)
     axs.tick_params(axis='y', which='both', left=True, right=True)
-    cbl = fig.add_axes([0.05, 0.0, 0.4, 0.1])
-    cbr = fig.add_axes([0.55, 0.0, 0.4, 0.1])
     
     # Plot temperature data.
     tcol_min = -0.15
@@ -115,11 +113,9 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     pcm = axs.pcolormesh(x2d, y2d, dso_anom['temp'], 
                          shading='nearest',
                          cmap='RdBu_r', norm=tnorm)
-    #plt.colorbar(pcm, location='bottom', extend='both',
-    #             shrink=0.5, pad=0.2, 
-    #             anchor=(0.0,1.0), panchor=(0.05, 0.0),
-    #             label='temperature anomaly (' + r'$^{\circ}$' + 'C)')
-    plt.colorbar(pcm, cax=cbl, orientation='horizontal',
+    plt.colorbar(pcm, location='bottom', extend='both',
+                 shrink=0.5, pad=0.2, 
+                 anchor=(0.0,1.0), panchor=(0.05, 0.0),
                  label='temperature anomaly (' + r'$^{\circ}$' + 'C)')
 
     # Plot velocity data.
@@ -143,12 +139,14 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
                 linewidths=0.7, linestyles=['dashed'])
     axs.clabel(cont, np.array([-3, -2, -1, 1, 2, 3]), fmt='%d', 
                fontsize=7.0, colors='k')
-    #plt.colorbar(contf, location='bottom', extend='both',
-    #             shrink=0.5, pad=0.2,
-    #             anchor=(0.0,1.0), panchor=(0.55, 0.0),
-    #             label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
-    plt.colorbar(contf, cax=cbr, orientation='horizontal',
+    plt.colorbar(contf, location='bottom', extend='both',
+                 shrink=0.5, pad=0.2, alpha=1.0,
+                 anchor=(0.0,1.0), panchor=(0.55, 0.0),
                  label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
+    
+    # Move the original axes to give a bit more space.
+    ll, bb, ww, hh = axs.get_position().bounds
+    axs.set_position([ll, bb + 0.1*hh, ww, hh*0.8])
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
