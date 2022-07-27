@@ -135,10 +135,11 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
                        levels=clevels,
                        cmap='PuOr', norm=unorm,
                        linewidths=0.7, linestyles=cltypes)
+    axs.contour(x2d, y2d, dso_anom['U_streamwise'],
+                levels=[0], colors=['k'], 
+                linewidths=[0.5], linestyles=['dashed'])
     axs.clabel(cont, np.array([-3, -2, -1, 1, 2, 3]), fmt='%d', 
                fontsize=7.0, colors='k')
-    #plt.colorbar(cont, cax=cbr, extend='both', orientation='horizontal', 
-    #             label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
     cb_arb = mpl.colorbar.ColorbarBase(cbr, cmap='PuOr', norm=unorm, 
                                        extend='both', orientation='horizontal',
                                        label='along-wind velocity anomaly (' 
