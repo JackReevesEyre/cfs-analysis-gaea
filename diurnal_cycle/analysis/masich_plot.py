@@ -91,7 +91,8 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
 
     # Set up main figure.
     fig = plt.figure(figsize=(6,4))
-    axs = fig.add_subplot(1,1,1)
+    gs = GridSpec(2, 2, height_ratios=[3,1])
+    axs = fig.add_subplot(gs[0,:])
     axs.set_title(lat_str + ' ' + lon_str, loc='left')
     axs.set_title(month, loc='right')
     axs.set_xlim(-0.5, 23.5)
@@ -102,6 +103,8 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     axs.set_ylabel('depth (m)')
     axs.tick_params(axis='x', which='both', bottom=True, top=True)
     axs.tick_params(axis='y', which='both', left=True, right=True)
+    cbl = fig.add_subplot(gs[1,0])
+    cbr = fig.add_subplot(gs[1,1])
     
     # Plot temperature data.
     tcol_min = -0.15
@@ -113,9 +116,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     pcm = axs.pcolormesh(x2d, y2d, dso_anom['temp'], 
                          shading='nearest',
                          cmap='RdBu_r', norm=tnorm)
-    plt.colorbar(pcm, ax=axs, location='bottom', extend='both',
-                 shrink=0.5, pad=0.2, 
-                 panchor=(0.0,0.0), anchor=(0.05, 0.0),
+    plt.colorbar(pcm, cax=cbl, extend='both', 
                  label='temperature anomaly (' + r'$^{\circ}$' + 'C)')
 
     # Plot velocity data.
@@ -133,14 +134,8 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
                        linewidths=0.7, linestyles=cltypes)
     axs.clabel(cont, np.array([-3, -2, -1, 1, 2, 3]), fmt='%d', 
                fontsize=7.0, colors='k')
-    plt.colorbar(cont, ax=axs, location='bottom', extend='both',
-                 shrink=0.5, pad=0.2,
-                 panchor=(0.0,0.0), anchor=(0.55, 0.0),
+    plt.colorbar(cont, cax=cbr, extend='both', 
                  label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
-    
-    # Move the original axes to give a bit more space.
-    ll, bb, ww, hh = axs.get_position().bounds
-    axs.set_position([ll, bb + 0.1*hh, ww, hh*0.8])
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
