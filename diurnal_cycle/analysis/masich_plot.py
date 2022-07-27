@@ -134,8 +134,12 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
                        linewidths=0.7, linestyles=cltypes)
     axs.clabel(cont, np.array([-3, -2, -1, 1, 2, 3]), fmt='%d', 
                fontsize=7.0, colors='k')
-    plt.colorbar(cont, cax=cbr, extend='both', orientation='horizontal', 
-                 label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
+    #plt.colorbar(cont, cax=cbr, extend='both', orientation='horizontal', 
+    #             label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
+    cb_arb = mpl.colorbar.ColorbarBase(cbr, cmap='PuOr', norm=unorm, 
+                                       extend='both', orientation='horizontal',
+                                       label='along-wind velocity anomaly (' 
+                                       + r'$cm\ s^{-1}$' + ')')
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
