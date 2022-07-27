@@ -113,8 +113,10 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     pcm = axs.pcolormesh(x2d, y2d, dso_anom['temp'], 
                          shading='nearest',
                          cmap='RdBu_r', norm=tnorm)
-    plt.colorbar(pcm, location='bottom', 
-                 label='temperature anomaly (' + r'$^{\circ}$' + ' C)')
+    plt.colorbar(pcm, location='bottom',
+                 shrink=0.5, pad=0.2, 
+                 anchor=(0.0,1.0), panchor=(0.05, 0.0),
+                 label='temperature anomaly (' + r'$^{\circ}$' + 'C)')
     
     # Plot velocity data.
     ucol_min = -3.0
@@ -129,7 +131,15 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
                        levels=clevels,
                        cmap='PuOr', norm=unorm,
                        linewidths=0.7, linestyles=cltypes)
-    
+    axs.contour(x2d, y2d, dso_anom['U_streamwise'],
+                levels=[0], colors=['k'], 
+                linewidths=0.7, linestyles=['dashed'])
+    axs.clabel(cont, np.array([-3, -2, -1, 1, 2, 3]), fmt='%d')
+    plt.colorbar(cont, location='bottom',
+                 shrink=0.5, pad=0.2,
+                 anchor=(0.0,1.0), panchor=(0.55, 0.0),
+                 label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
+
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
     plotfn = 'masich_plot_' + lat_str + '_' + lon_str + '_' + month + '.'
