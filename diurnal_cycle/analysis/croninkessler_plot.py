@@ -3,8 +3,9 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+import sys
 
-def main():
+def main(plot_month):
     
     # Specify which locations to plot for.
     latlon_pairs = np.array([[2.0, 220.0], [0.0, 220.0]])
@@ -12,9 +13,23 @@ def main():
     # Load data.
     ddir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/diurnal_cycle/'
     ds_atmo = xr.open_mfdataset(ddir + "atmo_*_points_meanDiurnalCycle.nc")\
-            .chunk({'time':48}).mean(dim='time').sel(height=10.0)
+            .chunk({'time':48}).sel(height=10.0)
     ds_ocean = xr.open_mfdataset(ddir + "ocn_*_meanDiurnalCycle.nc")\
-            .chunk({'time':48}).mean(dim='time')
+            .chunk({'time':48})
+
+    # Take time average (optionally for a subset of months).
+    if plot_month == 'ALL':
+        ds_atmo = ds_atmo.mean(dim='time')
+        ds_ocean = ds_ocean.mean(dim='time')
+        month_str = 'ANN'
+    else:
+        ds_atmo = ds_atmo.sel(time=(ds_atmo.time.dt.month == plot_month))\
+            .mean(dim='time')
+        ds_ocean = ds_ocean.sel(time=(ds_ocean.time.dt.month == plot_month))\
+            .mean(dim='time')
+        month_names = ['JAN','FEB','MAR','APR','MAY','JUN',
+                       'JUL','AUG','SEP','OCT','NOV','DEC']
+        month_str = month_names[plot_month - 1]
     
     # Loop over locations and plot.
     for i in range(latlon_pairs.shape[0]): 
@@ -25,7 +40,8 @@ def main():
                              xu_ocean=switch_lon_lims(latlon_pairs[i,1], 
                                                       min_lon=-280.0)), 
                 ds_atmo.sel(lat=latlon_pairs[i,0],
-                            lon=latlon_pairs[i,1]))
+                            lon=latlon_pairs[i,1]),
+                month_str)
 
     return
 
@@ -35,7 +51,7 @@ def switch_lon_lims(lon_list, min_lon=0.0):
     return result
 
 
-def ck_plot(dso, dsa): 
+def ck_plot(dso, dsa, month): 
     
     # Format lat and lon strings.
     if dsa['lat'] >= 0.0:
@@ -59,6 +75,7 @@ def ck_plot(dso, dsa):
     gs = GridSpec(2, 1, height_ratios=[1,10], hspace=0.0)
     axs = fig.add_subplot(gs[1,0])
     axs.set_title(lat_str + ' ' + lon_str, loc='left', pad=20)
+    axs.set_title(month, loc='right', pad=20)
     axs.set_xlim(-0.5, 23.5)
     ymin = 0.0
     ymax = 26.0
@@ -95,11 +112,15 @@ def ck_plot(dso, dsa):
 
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
-    plotfn = 'croninkessler_plot_' + lat_str + '_' + lon_str + '.'
+    plotfn = 'croninkessler_plot_' + lat_str + '_' + lon_str + '_' + month + '.'
     plotfileformat='pdf'
     plt.savefig(plotdir + plotfn + plotfileformat, format=plotfileformat)
     return
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 1:
+        plot_month = 'ALL'
+    else:
+        plot_month = int(sys.argv[1])
+    main(plot_month)
