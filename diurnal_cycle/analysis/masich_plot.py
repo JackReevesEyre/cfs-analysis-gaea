@@ -91,7 +91,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
 
     # Set up main figure.
     fig = plt.figure(figsize=(6,4))
-    axs = fig.add_subplot(1,1,1)
+    axs = fig.add_subplot(1,1,1, position=[0.05, 0.25, 0.9, 0.7])
     axs.set_title(lat_str + ' ' + lon_str, loc='left', pad=20)
     axs.set_title(month, loc='right', pad=20)
     axs.set_xlim(-0.5, 23.5)
@@ -119,7 +119,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     #             shrink=0.5, pad=0.2, 
     #             anchor=(0.0,1.0), panchor=(0.05, 0.0),
     #             label='temperature anomaly (' + r'$^{\circ}$' + 'C)')
-    plt.colorbar(pcm, cax=cbl,
+    plt.colorbar(pcm, cax=cbl, orientation='horizontal',
                  label='temperature anomaly (' + r'$^{\circ}$' + 'C)')
 
     # Plot velocity data.
@@ -147,7 +147,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     #             shrink=0.5, pad=0.2,
     #             anchor=(0.0,1.0), panchor=(0.55, 0.0),
     #             label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
-    plt.colorbar(contf, cax=cbr,
+    plt.colorbar(contf, cax=cbr, orientation='horizontal',
                  label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
     
     # Save file.
