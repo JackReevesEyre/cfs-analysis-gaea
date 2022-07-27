@@ -8,7 +8,11 @@ import sys
 def main(plot_month):
     
     # Specify which locations to plot for.
-    latlon_pairs = np.array([[2.0, 220.0], [0.0, 220.0]])
+    latlon_pairs = np.array([[2.0, 220.0], [0.0, 220.0],
+                             [8.0, 165.0],[-2.0, 165.0],
+                             [-8.0, 180.0],[0.0, 180.0],
+                             [0.0, 205.0],[-2.0, 220.0],
+                             [2.0, 235.0]])
 
     # Load data.
     ddir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/diurnal_cycle/'
@@ -61,7 +65,7 @@ def ck_plot(dso, dsa, month):
     if dsa['lon'] > 180.0:
         lon_str = "{:.1f}".format(360.0 - dsa['lon'].data) + 'W'
     else:
-        lon_str = "{:.1f}".format(dso['lon'].data) + 'E'
+        lon_str = "{:.1f}".format(dsa['lon'].data) + 'E'
     
     # Change hour to local time.
     hours_ahead = np.around(dsa['lon'].data/15.0)

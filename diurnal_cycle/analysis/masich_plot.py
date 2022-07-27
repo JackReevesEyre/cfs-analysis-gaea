@@ -9,7 +9,11 @@ import utils
 def main(plot_month):
     
     # Specify which locations to plot for.
-    latlon_pairs = np.array([[2.0, 220.0], [0.0, 220.0]])
+    latlon_pairs = np.array([[2.0, 220.0], [0.0, 220.0],
+                             [8.0, 165.0],[-2.0, 165.0],
+                             [-8.0, 180.0],[0.0, 180.0],
+                             [0.0, 205.0],[-2.0, 220.0],
+                             [2.0, 235.0]])
 
     # Load data.
     ddir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/diurnal_cycle/'
@@ -40,7 +44,10 @@ def main(plot_month):
                                  'math', exp_dim=(0,1))
 
     # Loop over locations and plot.
-    for i in range(latlon_pairs.shape[0]): 
+    for i in range(latlon_pairs.shape[0]):
+        print('Plotting:')
+        print(latlon_pairs[i,:])
+        print(switch_lon_lims(latlon_pairs[i,1],min_lon=-280.0))
         ma_plot(ds_ocean.sel(yt_ocean=latlon_pairs[i,0],
                              yu_ocean=latlon_pairs[i,0],
                              xt_ocean=switch_lon_lims(latlon_pairs[i,1], 
@@ -69,7 +76,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     if dsa['lon'] > 180.0:
         lon_str = "{:.1f}".format(360.0 - dsa['lon'].data) + 'W'
     else:
-        lon_str = "{:.1f}".format(dso['lon'].data) + 'E'
+        lon_str = "{:.1f}".format(dsa['lon'].data) + 'E'
     
     # Change hour to local time.
     hours_ahead = np.around(dsa['lon'].data/15.0)
@@ -99,7 +106,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     ymin = 0.0
     ymax = max_depth
     axs.set_ylim(ymax, ymin)
-    axs.set_xlabel('time (local)')
+    axs.set_xlabel('hours since local midnight')
     axs.set_ylabel('depth (m)')
     axs.tick_params(axis='x', which='both', bottom=True, top=True)
     axs.tick_params(axis='y', which='both', left=True, right=True)
@@ -111,7 +118,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     # Plot temperature data.
     tcol_min = -0.15
     tcol_max = 0.15
-    tbounds = np.linspace(tcol_min, tcol_max, 11)
+    tbounds = np.linspace(tcol_min, tcol_max, 13)
     tnorm = mpl.colors.BoundaryNorm(boundaries=tbounds, ncolors=256, extend='both')
     x2d, y2d = np.meshgrid(dso_anom['hour'], dso_anom['st_ocean'], 
                            indexing='ij')
@@ -125,7 +132,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     # Plot velocity data.
     ucol_min = -3.0
     ucol_max = 3.0
-    ubounds = np.linspace(ucol_min, ucol_max, 11)
+    ubounds = np.linspace(ucol_min, ucol_max, 13)
     unorm = mpl.colors.BoundaryNorm(boundaries=ubounds, ncolors=256, extend='both')
     clevels = np.arange(-3.0, 3.1, 0.5)
     cltypes = np.array(clevels, dtype='object_')
