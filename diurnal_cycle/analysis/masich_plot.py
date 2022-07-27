@@ -116,7 +116,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     pcm = axs.pcolormesh(x2d, y2d, dso_anom['temp'], 
                          shading='nearest',
                          cmap='RdBu_r', norm=tnorm)
-    plt.colorbar(pcm, cax=cbl, extend='both', 
+    plt.colorbar(pcm, cax=cbl, extend='both', orientation='horizontal',
                  label='temperature anomaly (' + r'$^{\circ}$' + 'C)')
 
     # Plot velocity data.
@@ -134,7 +134,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
                        linewidths=0.7, linestyles=cltypes)
     axs.clabel(cont, np.array([-3, -2, -1, 1, 2, 3]), fmt='%d', 
                fontsize=7.0, colors='k')
-    plt.colorbar(cont, cax=cbr, extend='both', 
+    plt.colorbar(cont, cax=cbr, extend='both', orientation='horizontal', 
                  label='along-wind velocity anomaly (' + r'$cm\ s^{-1}$' + ')')
     
     # Save file.
