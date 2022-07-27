@@ -91,7 +91,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
 
     # Set up main figure.
     fig = plt.figure(figsize=(6,4))
-    gs = GridSpec(2, 2, height_ratios=[4,1], hspace=0.3)
+    gs = GridSpec(2, 2, height_ratios=[4,1], hspace=0.5)
     axs = fig.add_subplot(gs[0,:])
     axs.set_title(lat_str + ' ' + lon_str, loc='left')
     axs.set_title(month, loc='right')
@@ -104,7 +104,9 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     axs.tick_params(axis='x', which='both', bottom=True, top=True)
     axs.tick_params(axis='y', which='both', left=True, right=True)
     cbl = fig.add_subplot(gs[1,0])
+    cbl.tick_params(labelsize=7)
     cbr = fig.add_subplot(gs[1,1])
+    cbr.tick_params(labelsize=7)
     
     # Plot temperature data.
     tcol_min = -0.15
@@ -117,7 +119,8 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
                          shading='nearest',
                          cmap='RdBu_r', norm=tnorm)
     plt.colorbar(pcm, cax=cbl, extend='both', orientation='horizontal',
-                 label='temperature anomaly (' + r'$^{\circ}$' + 'C)')
+                 label='temperature anomaly (' + r'$^{\circ}$' + 'C)',
+                 ticks=np.arange(-0.15,0.16,0.05))
 
     # Plot velocity data.
     ucol_min = -3.0
@@ -139,7 +142,8 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
     cb_arb = mpl.colorbar.ColorbarBase(cbr, cmap='PuOr', norm=unorm, 
                                        extend='both', orientation='horizontal',
                                        label='along-wind velocity anomaly (' 
-                                       + r'$cm\ s^{-1}$' + ')')
+                                       + r'$cm\ s^{-1}$' + ')',
+                                       ticks=np.arange(-3.0, 3.1, 1.0))
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
