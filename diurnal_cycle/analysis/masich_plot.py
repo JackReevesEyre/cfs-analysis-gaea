@@ -91,7 +91,7 @@ def ma_plot(dso, dsa, month, max_depth=60.0):
 
     # Set up main figure.
     fig = plt.figure(figsize=(6,4))
-    gs = GridSpec(2, 2, height_ratios=[3,1])
+    gs = GridSpec(2, 2, height_ratios=[4,1], hspace=0.3)
     axs = fig.add_subplot(gs[0,:])
     axs.set_title(lat_str + ' ' + lon_str, loc='left')
     axs.set_title(month, loc='right')
