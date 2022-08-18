@@ -5,7 +5,7 @@ module load cdo
 indir="/lustre/f2/dev/ncep/JieShun.Zhu/CFSm501hr/CFSm501hr1980010200/DATA/"
 outdir="/lustre/f2/dev/ncep/Jack.Reeveseyre/diurnal_cycle/"
 tmpdir="/lustre/f2/dev/ncep/Jack.Reeveseyre/diurnal_cycle/tmp/"
-codedir="/ncrc/home2/Jack.Reeveseyre/code/diurnal_cycle/"
+codedir="/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/data_processing/"
 
 cdoout=${codedir}cdoout
 touch ${cdoout}
@@ -44,7 +44,7 @@ do
     fi
 
     echo "Calculating monthly mean diurnal cycle..."
-    python save_atmo_monthlyDiurnalCycle.py ${hs} ${he} ${tmpdir} ${outdir} "${fnlist}"
+    python save_atmo_monthlyDiurnalCycle.py grid ${hs} ${he} ${tmpdir} ${outdir} "${fnlist}"
     pyran=$?
 
     if [ $pyran == 0 ]; then

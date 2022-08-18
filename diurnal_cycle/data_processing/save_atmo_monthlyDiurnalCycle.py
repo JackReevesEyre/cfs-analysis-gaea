@@ -5,7 +5,7 @@ import datetime
 import sys
 import re
 
-def main(h_start, h_end, indir, outdir, f_list):
+def main(xy_method, h_start, h_end, indir, outdir, f_list):
     
     ref_time = np.datetime64('1980-01-02T00:00')
     t_start = ref_time + np.timedelta64(h_start, 'h')
@@ -23,15 +23,16 @@ def main(h_start, h_end, indir, outdir, f_list):
         month = int(ms)
     
     print('Processing ' + str(year) + '-' + str(month) + '...')
-     
-    xy_method = 'points' # 'grid' or 'points'
-    interp_method = 'nearest' # only needed if xy_method == 'points'
+   
+    # Spatial details:
+    z_lim = 100.0
+    # Only needed if xy_method == 'points':
+    interp_method = 'nearest' 
     lats = np.array([-8.0, -5.0, -2.0, 0.0, 2.0, 5.0, 8.0, 9.0])
     lons = np.array([137.0, 147.0, 156.0, 165.0, 180.0, 190.0, 
                      205.0, 220.0, 235.0, 250.0, 265.0])
     if np.max(lats) > 60.0:
-        print('Warning: interpolation to points not currently supported north of 60N.')
-    z_lim = 100.0
+        print('Warning: interpolation to points not currently supported north of 60N.') 
     
     if xy_method == 'points':
         t1 = datetime.datetime.now()
@@ -43,8 +44,14 @@ def main(h_start, h_end, indir, outdir, f_list):
         t2 = datetime.datetime.now()
         dt2 = t2 - t1
         print(f'Time taken to read with open_mfdataset: {dt2}')
-    elif xy_method == 'grid':
-        print('grid method not yet implemented...')
+    elif xy_method == 'grid':        
+        t1 = datetime.datetime.now()
+        ds = get_mon_di_cy_grid(year, month,
+                                indir, f_list,
+                                z_lim, t_array_test)
+        t2 = datetime.datetime.now()
+        dt2 = t2 - t1
+        print(f'Time taken to read with open_mfdataset: {dt2}')
     else:
         sys.exit('xy_method should be one of {points, grid}')  
     
@@ -141,7 +148,62 @@ def get_mon_di_cy_points(yr, mn, data_dir, flist,
     ds_all.close()
     
     return di_cy
- 
+
+
+def get_mon_di_cy_grid(yr, mn, data_dir, flist,
+                       max_depth, test_times):
+
+    var_list = ['var33', 'var34']
+
+    # Loads all files for one month.
+    if flist == 'None':
+        flist_arg = data_dir + 'flxf*nc'
+    else:
+        flist_arg = [data_dir + fn + ".nc"
+                     for fn in flist.rstrip().split(" ")]
+    ds_all = xr.open_mfdataset(
+        flist_arg,
+        engine='netcdf4',
+        preprocess=time_from_filename,
+        decode_times=False
+    )
+
+    # Decode and test time array.
+    ds_all = xr.decode_cf(ds_all, decode_times=True)
+    if np.all(np.equal(ds_all.time.data, test_times)):
+        print('New time variable is as expected...')
+    else:
+        print('New time variable does not match test values !!')
+        import pdb; pdb.set_trace()
+
+    # Calculate mean diurnal cycle.
+    ds_sub = ds_all[var_list]
+    di_cy = ds_sub.groupby('time.hour')\
+            .mean('time').chunk({'hour':24}).load()
+    di_cy = di_cy.assign_coords({'time':np.datetime64(str(yr) + '-' + "{:0>2d}".format(mn), 's')})
+    di_cy = di_cy.expand_dims(dim='time', axis=0)
+
+    # Copy/add attributes.
+    for v in var_list:
+        di_cy[v].attrs = ds_sub[v].attrs
+        di_cy[v].attrs['cell_methods'] = \
+            'hour: mean within hours, time: mean over days (comment: monthly mean diurnal cycle)'
+    di_cy.attrs = ds_sub.attrs
+    di_cy.attrs['postprocessing'] = 'monthly mean diurnal cycle'
+
+    # Rename variables and add attributes.
+    di_cy = di_cy.rename({'var33':'UGRD', 'var34':'VGRD'})
+    di_cy['UGRD'].attrs['standard_name'] = 'eastward_wind'
+    di_cy['UGRD'].attrs['long_name'] = 'eastward_component_of_wind_velocity'
+    di_cy['UGRD'].attrs['units'] = 'm s-1'
+    di_cy['VGRD'].attrs['standard_name'] = 'northward_wind'
+    di_cy['VGRD'].attrs['long_name'] = 'northward_component_of_wind_velocity'
+    di_cy['VGRD'].attrs['units'] = 'm s-1'
+
+    ds_all.close()
+
+    return di_cy
+
 
 def switch_lon_lims(lon_list, min_lon=0.0):
     result = (lon_list - min_lon) % 360.0 + min_lon
@@ -150,4 +212,4 @@ def switch_lon_lims(lon_list, min_lon=0.0):
 
 if __name__ == '__main__': 
     cla = sys.argv
-    main(cla[1], cla[2], cla[3], cla[4], cla[5])
+    main(cla[1], cla[2], cla[3], cla[4], cla[5], cla[6])
