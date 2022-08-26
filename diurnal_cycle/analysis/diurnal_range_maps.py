@@ -41,90 +41,138 @@ def main(plot_month, plot_var, plot_type):
     """
 
     # Define some useful constants.
+    ddir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/diurnal_cycle/'
     atmo_chunks = {'time':48, 'hour':24, 'height':1, 'lat':190, 'lon':384}
     ocn_chunks = {'time':48, 'hour':24, 'st_ocean':20, 'yt_ocean':10,
                   'xt_ocean':20, 'yu_ocean':10, 'xu_ocean':20}
-    var_name_dict = {'TEMP':'temp'}
-
-    # Load data.
-    ddir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/diurnal_cycle/'
-    if plot_var == 'WIND':
-        file_list = get_filelist('atmo', plot_month, ddir)
-        ds = xr.open_mfdataset(file_list)[['UGRD', 'VGRD']].sel(height=10.0)
-        ds.attrs['input_files'] = file_list
-    elif plot_var == 'CUR':
-        atmo_file_list = get_filelist('atmo', plot_month, ddir)
-        # Or maybe should be:
-        #atmo_file_list = get_filelist('atmo', 'ANN', ddir)
-        ds_atmo_rec_mean = xr.open_mfdataset(atmo_file_list)[['UGRD', 'VGRD']]\
-            .sel(height=10.0).mean(dim=['time','hour'], keep_attrs=True)
-        file_list = get_filelist('ocn', plot_month, ddir)
-        ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[['u', 'v']]
-        if plot_type in ['RANGE', 'PHASE']:
-            ds = ds.isel(st_ocean=0)
-        # Calculate down-wind current.
-        ds_atmo_rec_mean = utils.wind_dir_twice(ds_atmo_rec_mean, 'UGRD', 'VGRD')
-        ds = utils.rotation_xy(ds, 'u', 'v',
-                               np.radians(ds_atmo_rec_mean['arctan_VoverU'].data),
-                               'math', exp_dim=(0,1))
-        ds.attrs['input_files'] = file_list
-    elif plot_var == 'TEMP':
-        file_list = get_filelist('ocn', plot_month, ddir)
-        ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[['temp']]
-        if plot_type in ['RANGE', 'PHASE']:
-            ds = ds.isel(st_ocean=0)
-        ds.attrs['input_files'] = file_list
-    else:
-        sys.exit('plot_var not recognized.')
-    
-    # Take time average. 
-    ds = ds.mean(dim='time', keep_attrs=True)
     
     # Construct month string.
     if plot_month == 'ANN':
         month_str = 'ANN'
-    else: 
+    else:
         month_names = ['JAN','FEB','MAR','APR','MAY','JUN',
                        'JUL','AUG','SEP','OCT','NOV','DEC']
         plot_month_list = np.array(plot_month.split(','), dtype=int)
         if len(plot_month_list) == 1:
             month_str = month_names[plot_month_list[0] - 1]
         else:
-            month_str = ''.join([month_names[m-1][0] 
+            month_str = ''.join([month_names[m-1][0]
                                  for m in plot_month_list])
             if month_str == 'JFD':
                 month_str = 'DJF'
-
-    # Change NaN to an unrealistic value.
-    # (Some of the functions below cannot handle all-NaN slices.)
-    nan_hr_mask = xr.where(
-        np.isnan(ds[var_name_dict[plot_var]]).sum(dim='hour') < 24,
-        1, np.nan 
-    )
-    unrealistic_value = -9999.0
-    ds[var_name_dict[plot_var]] = ds[var_name_dict[plot_var]].where(
-        ~np.isnan(ds[var_name_dict[plot_var]]),
-        other=unrealistic_value
-    )
     
-    # Calculate statistics (range etc.)
-    if plot_type in ['RANGE', 'HALF_DEPTH', 'PHASE_DELAY', 'ALL']:
-        ds['RANGE'] = (ds[var_name_dict[plot_var]].max(dim='hour') \
-            - ds[var_name_dict[plot_var]].min(dim='hour'))*nan_hr_mask
-    if plot_type in ['PHASE', 'PHASE_DELAY', 'ALL']:
-        iPHASE = ds[var_name_dict[plot_var]].argmax(dim='hour').compute()
-        ds['PHASE'] = ds.hour[iPHASE]*nan_hr_mask
-        local_m_utc = approx_local_time(ds)
-        ds['PHASE'] = (ds['PHASE'] + local_m_utc) % 24
-    if plot_type in ['HALF_DEPTH', 'PHASE_DELAY', 'ALL']:
-        iHALF = (ds['RANGE'] >= 0.5*ds['RANGE'].isel(st_ocean=0))\
-            .cumprod(dim='st_ocean').sum(dim='st_ocean').compute() - 1
-        ds['HALF_DEPTH'] = ds.st_ocean[iHALF]
-    if plot_type in ['PHASE_DELAY', 'ALL']:
-        ds['PHASE_DELAY'] = \
-            (ds['PHASE'].isel(st_ocean=iHALF.where(iHALF >= 0, other=0)) 
-             - ds['PHASE'].isel(st_ocean=0))*nan_hr_mask
-
+    # Construct file name and open it if it exists.
+    dicy_fn = 'meanDiurnalCycle_metrics_' + plot_var + '_' + month_str + '.nc'
+    try:
+        ds = xr.open_dataset(ddir + dicy_fn)
+    except:
+        # If it doesn't exist, construct it:
+        
+        # Load data.
+        if plot_var == 'WIND':
+            file_list = get_filelist('atmo', plot_month, ddir)
+            ds = xr.open_mfdataset(file_list)[['UGRD', 'VGRD']].sel(height=10.0)
+            ds.attrs['input_files'] = file_list
+        elif plot_var == 'CUR':
+            atmo_file_list = get_filelist('atmo', plot_month, ddir)
+            # Or maybe should be:
+            #atmo_file_list = get_filelist('atmo', 'ANN', ddir)
+            ds_atmo_rec_mean = xr.open_mfdataset(atmo_file_list)[['UGRD', 'VGRD']]\
+            .sel(height=10.0).mean(dim=['time','hour'], keep_attrs=True)
+            file_list = get_filelist('ocn', plot_month, ddir)
+            ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[['u', 'v']]
+            # Calculate down-wind current.
+            ds_atmo_rec_mean = utils.wind_dir_twice(ds_atmo_rec_mean, 'UGRD', 'VGRD')
+            ds = utils.rotation_xy(ds, 'u', 'v',
+                                   np.radians(ds_atmo_rec_mean['arctan_VoverU'].data),
+                                   'math', exp_dim=(0,1))
+            ds.attrs['input_files'] = file_list
+            ds_var = 'streamwise'
+        elif plot_var == 'TEMP':
+            file_list = get_filelist('ocn', plot_month, ddir)
+            ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[['temp']]
+            ds.attrs['input_files'] = file_list
+            ds_var = 'temp'
+        else:
+            sys.exit('plot_var not recognized.')
+        
+        # Take time average. 
+        ds = ds.mean(dim='time', keep_attrs=True)
+        
+        # Change NaN to an unrealistic value.
+        # (Some of the functions below cannot handle all-NaN slices.)
+        nan_hr_mask = xr.where(
+            np.isnan(ds[ds_var].isel(st_ocean=0)).sum(dim='hour') < 24,
+            1, np.nan 
+        )
+        unrealistic_value = -9999.0
+        ds[ds_var] = ds[ds_var].where(~np.isnan(ds[ds_var]), 
+                                      other=unrealistic_value)
+        
+        # Calculate statistics (range etc.)
+        if plot_var in ['TEMP', 'CUR']:
+            RANGE_3D = (ds[ds_var].max(dim='hour') 
+                        - ds[ds_var].min(dim='hour')).compute()
+            iPHASE = ds[ds_var].argmax(dim='hour').compute()
+            local_m_utc = approx_local_time(ds)
+            PHASE_3D = (ds.hour[iPHASE] + local_m_utc) % 24
+            iHALF = (RANGE_3D >= 0.5*RANGE_3D.isel(st_ocean=0))\
+                .cumprod(dim='st_ocean').sum(dim='st_ocean') - 1
+            print('Check that the negative indices in iHALF are for the NaN (land) data points.')
+            iHALF = iHALF.where(iHALF >= 0, other=0)
+            ds['RANGE'] = RANGE_3D.isel(st_ocean=0)*nan_hr_mask
+            ds['PHASE'] = PHASE_3D.isel(st_ocean=0)*nan_hr_mask
+            ds['HALF_DEPTH'] = ds.st_ocean[iHALF]*nan_hr_mask
+            ds['PHASE_DELAY'] = (PHASE_3D.isel(st_ocean=iHALF) 
+                                 - PHASE_3D.isel(st_ocean=0))*nan_hr_mask % 24
+            ds_out = ds[['RANGE', 'PHASE', 'HALF_DEPTH', 'PHASE_DELAY']]
+        else:
+            ds['RANGE'] = (ds[ds_var].max(dim='hour') 
+                           - ds[ds_var].min(dim='hour')).compute()*nan_hr_mask
+            local_m_utc = approx_local_time(ds)
+            iPHASE = ds[ds_var].argmax(dim='hour').compute()
+            ds['PHASE'] = (ds.hour[iPHASE] + local_m_utc) % 24
+            ds_out = ds[['RANGE', 'PHASE']]
+        
+        # Save out data.
+        ds_out['RANGE'].attrs = {
+            'long_name':'range of mean diurnal cycle',
+            'units':'K',
+            'variable':ds[ds_var].attrs['long_name'],
+            'cell_methods':month_str + ' mean over years & months for each hour of day; (max - min) over hours of day.',
+            'time_period':month_str + ' 2002-2005' 
+        }
+        ds_out['PHASE'].attrs = {
+            'long_name':'local time of diurnal cycle maximum',
+            'units':'hours',
+            'variable':ds[ds_var].attrs['long_name'],
+            'cell_methods':month_str + ' mean over years & months for each hour of day; local time of max over hours of day.',
+            'time_period':month_str + ' 2002-2005'
+        }
+        if plot_var in ['TEMP', 'CUR']:
+            ds_out['HALF_DEPTH'].attrs = {
+                'long_name':'depth at which range of mean diurnal cycle is half of surface range',
+                'units':'m',
+                'variable':ds[ds_var].attrs['long_name'],
+                'cell_methods':month_str + ' mean over years & months for each hour of day; (max - min) over hours of day; deepest grid level i such that range[i] >= range[surface].',
+                'time_period':month_str + ' 2002-2005'
+            }
+            ds_out['PHASE_DELAY'].attrs = {
+                'long_name':'delay of time of diurnal cycle maximum at HALF_DEPTH after maximum at surface',
+                'units':'hours',
+                'variable':ds[ds_var].attrs['long_name'],
+                'cell_methods':month_str + ' mean over years & months for each hour of day ; (max - min) over hours of day.',
+                'time_period':month_str + ' 2002-2005'
+            }
+        fill_val_f64 = 9.969209968386869e+36
+        nc_enc = {}
+        for k in ds_out.keys():
+            nc_enc[k] = {'dtype':'float64', '_FillValue':fill_val_f64}
+        print(ds_out)
+        ds_out.to_netcdf(path=ddir + dicy_fn,
+                         mode='w',format='NETCDF4',
+                         encoding=nc_enc)
+    
     # Plot.
     if plot_type == 'ALL':
         plot_all_maps(ds, plot_var, month_str)
