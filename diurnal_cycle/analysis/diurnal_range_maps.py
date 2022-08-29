@@ -216,9 +216,9 @@ def plot_one_map(ds, ptype, pvar, mon):
     # Finish up figure.
     ax.set_title(plot_dets(pvar, 'plotname') + ' DIURNAL CYCLE ' + ptype
                  + ', ' + mon)
-    fig.colorbar(p,
-                 label=ptype + ' (' + plot_dets(pvar, 'units', ptype) + ')',
-                 ax=ax, orientation='horizontal',shrink=0.5)
+    #fig.colorbar(p,
+    #             label=ptype + ' (' + plot_dets(pvar, 'units', ptype) + ')',
+    #             ax=ax, orientation='horizontal',shrink=0.5)
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
