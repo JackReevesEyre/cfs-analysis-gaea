@@ -65,7 +65,6 @@ def main(plot_month, plot_var, plot_type):
     dicy_fn = 'meanDiurnalCycle_metrics_' + plot_var + '_' + month_str + '.nc'
     try:
         ds = xr.open_dataset(ddir + dicy_fn)
-        import pdb; pdb.set_trace()
     except:
         # If it doesn't exist, construct it:
         
@@ -207,18 +206,19 @@ def plot_one_map(ds, ptype, pvar, mon):
                                  ncolors=cmap_b.N)
     
     # Plot the data.
+    import pdb; pdb.set_trace()
     p = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data,-180.0),
                       ds[plot_dets(pvar, 'latname')].data,
 		      ds[ptype].data,
                       transform=map_proj,
-                      cmap=cmap_b, norm=norm_b)
+                      cmap=cmap_b, norm=norm_b, shading='nearest')
     
     # Finish up figure.
     ax.set_title(plot_dets(pvar, 'plotname') + ' DIURNAL CYCLE ' + ptype
                  + ', ' + mon)
-    #fig.colorbar(p,
-    #             label=ptype + ' (' + plot_dets(pvar, 'units', ptype) + ')',
-    #             ax=ax, orientation='horizontal',shrink=0.5)
+    fig.colorbar(p,
+                 label=ptype + ' (' + plot_dets(pvar, 'units', ptype) + ')',
+                 ax=ax, orientation='horizontal',shrink=0.5)
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
