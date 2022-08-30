@@ -118,7 +118,6 @@ def main(plot_month, plot_var, plot_type):
             PHASE_3D = (ds.hour[iPHASE] + local_m_utc) % 24
             iHALF = (RANGE_3D >= 0.5*RANGE_3D.isel(st_ocean=0))\
                 .cumprod(dim='st_ocean').sum(dim='st_ocean') - 1
-            print('Check that the negative indices in iHALF are for the NaN (land) data points.')
             iHALF = iHALF.where(iHALF >= 0, other=0)
             ds['RANGE'] = RANGE_3D.isel(st_ocean=0)*nan_hr_mask
             ds['PHASE'] = PHASE_3D.isel(st_ocean=0)*nan_hr_mask
@@ -191,7 +190,8 @@ def plot_one_map(ds, ptype, pvar, mon):
     ax.set_global()
     gl = ax.gridlines(draw_labels=True,
                       xlocs=np.arange(-300, 151, 60),
-                      ylocs=np.arange(-90, 91, 30))
+                      ylocs=np.arange(-90, 91, 30),
+                      linewidth=0.3)
     gl.right_labels = True
     gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                        degree_symbol='')
@@ -253,7 +253,7 @@ def approx_local_time(ds):
         print('longitude variable not found.')
         print(ds)
         lon_name = input('Please enter the name of the longitude varible:\n')
-        lon = ds['lon_name']
+        lon = ds[lon_name]
     lt = switch_lon_lims(lon, min_lon=-180.0)/15.0
     return lt
 
