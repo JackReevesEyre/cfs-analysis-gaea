@@ -207,11 +207,11 @@ def plot_one_map(ds, ptype, pvar, mon):
     
     # Plot the data.
     import pdb; pdb.set_trace()
-    p = ax.pcolormesh(ds[plot_dets(pvar, 'lonname')].data,
-                      ds[plot_dets(pvar, 'latname')].data,
-		      ds[ptype].data,
-                      transform=map_proj,
-                      cmap=cmap_b, norm=norm_b, shading='nearest')
+    p = ax.contourf(ds[plot_dets(pvar, 'lonname')].data,
+                    ds[plot_dets(pvar, 'latname')].data,
+		    ds[ptype].data,
+                    transform=map_proj,
+                    cmap=cmap_b, norm=norm_b, shading='nearest')
     
     # Finish up figure.
     ax.set_title(plot_dets(pvar, 'plotname') + ' DIURNAL CYCLE ' + ptype
