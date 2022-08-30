@@ -207,7 +207,7 @@ def plot_one_map(ds, ptype, pvar, mon):
     
     # Plot the data.
     import pdb; pdb.set_trace()
-    p = ax.pcolormesh(ds[plot_dets(pvar, 'lonname')].data,
+    p = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data, -180.0),
                       ds[plot_dets(pvar, 'latname')].data,
 		      ds[ptype].data,
                       transform=map_proj,
