@@ -191,7 +191,7 @@ def plot_one_map(ds, ptype, pvar, mon):
     gl = ax.gridlines(draw_labels=True,
                       xlocs=np.arange(-300, 151, 60),
                       ylocs=np.arange(-90, 91, 30),
-                      linewidth=0.3)
+                      linewidths=0.3)
     gl.right_labels = True
     gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                        degree_symbol='')
