@@ -185,7 +185,7 @@ def plot_one_map(ds, ptype, pvar, mon):
     
     # Set up figure and axes.
     fig = plt.figure(figsize=(8, 6))
-    map_proj = ccrs.Robinson(central_longitude=-150)
+    map_proj = ccrs.PlateCarree() #ccrs.Robinson(central_longitude=-150)
     ax = fig.add_subplot(111, projection=map_proj)
     ax.set_global()
     gl = ax.gridlines(draw_labels=True,
@@ -207,11 +207,11 @@ def plot_one_map(ds, ptype, pvar, mon):
     
     # Plot the data.
     import pdb; pdb.set_trace()
-    p = ax.contourf(ds[plot_dets(pvar, 'lonname')].data,
-                    ds[plot_dets(pvar, 'latname')].data,
-		    ds[ptype].data,
-                    transform=map_proj,
-                    cmap=cmap_b, norm=norm_b, shading='nearest')
+    p = ax.pcolormesh(ds[plot_dets(pvar, 'lonname')].data,
+                      ds[plot_dets(pvar, 'latname')].data,
+		      ds[ptype].data,
+                      transform=map_proj,
+                      cmap=cmap_b, norm=norm_b, shading='nearest')
     
     # Finish up figure.
     ax.set_title(plot_dets(pvar, 'plotname') + ' DIURNAL CYCLE ' + ptype
