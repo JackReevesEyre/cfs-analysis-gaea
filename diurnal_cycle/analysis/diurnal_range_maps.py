@@ -190,13 +190,14 @@ def plot_one_map(ds, ptype, pvar, mon):
     ax.set_global()
     gl = ax.gridlines(draw_labels=True,
                       xlocs=np.arange(-300, 151, 60),
-                      ylocs=np.arange(-90, 91, 30))
+                      ylocs=np.arange(-90, 91, 30),
+                      zorder=4)
     gl.right_labels = True
     gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                        degree_symbol='')
     gl.yformatter = LatitudeFormatter(degree_symbol='')
-    ax.coastlines()
-    ax.add_feature(cfeature.LAND, facecolor='lightgray')
+    ax.coastlines(zorder=2)
+    ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=1)
     
     # Define color map.
     cmap_b = plt.get_cmap(plot_dets(pvar, 'cmap', ptype))
@@ -210,7 +211,7 @@ def plot_one_map(ds, ptype, pvar, mon):
     p = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data,-180.0),
                       ds[plot_dets(pvar, 'latname')].data,
 		      ds[ptype].data,
-                      transform=map_proj,
+                      transform=map_proj, zorder=3,
                       cmap=cmap_b, norm=norm_b, shading='nearest')
     
     # Finish up figure.
