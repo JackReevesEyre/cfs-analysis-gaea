@@ -185,8 +185,9 @@ def plot_one_map(ds, ptype, pvar, mon):
     
     # Set up figure and axes.
     fig = plt.figure(figsize=(8, 6))
-    map_proj = ccrs.PlateCarree() #ccrs.Robinson(central_longitude=-150)
-    ax = fig.add_subplot(111, projection=map_proj)
+    data_crs = ccrs.PlateCarree()
+    plot_crs = ccrs.Robinson(central_longitude=-150)
+    ax = fig.add_subplot(111, projection=plot_crs)
     ax.set_global()
     gl = ax.gridlines(draw_labels=True,
                       xlocs=np.arange(-300, 151, 60),
@@ -210,7 +211,7 @@ def plot_one_map(ds, ptype, pvar, mon):
     p = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data, -180.0),
                       ds[plot_dets(pvar, 'latname')].data,
 		      ds[ptype].data,
-                      transform=map_proj,
+                      transform=data_crs,
                       cmap=cmap_b, norm=norm_b, shading='nearest')
     
     # Finish up figure.
