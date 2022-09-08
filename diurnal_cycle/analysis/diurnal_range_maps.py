@@ -184,7 +184,6 @@ def main(plot_month, plot_var, plot_type):
             ds[v].attrs['units'] = 'cm s-1'
 
     # Plot.
-    import pdb; pdb.set_trace()
     if plot_type == 'ALL':
         plot_all_maps(ds, plot_var, month_str)
     else:
@@ -195,7 +194,7 @@ def main(plot_month, plot_var, plot_type):
 def plot_one_map(ds, ptype, pvar, mon):
     
     # Define whether and where to mask fields according to diurnal range.
-    range_mask = 0.0
+    range_mask = plot_dets(pvar, 'mask_lim')
     
     # Set up figure and axes.
     fig = plt.figure(figsize=(8, 6))
@@ -322,6 +321,7 @@ def get_filelist(comp, plot_month, ddir):
 def plot_dets(vn, att, pty=None):
     det_dict = {
         'TEMP':{
+            'mask_lim':0.1,
 	    'latname':'geolat_t',
 	    'lonname':'geolon_t',
 	    'plotname':'SST',
@@ -348,11 +348,12 @@ def plot_dets(vn, att, pty=None):
 
 	},
         'CUR':{
+            'mask_lim':2.0,
             'latname':'geolat_c',
             'lonname':'geolon_c',
             'plotname':'SST',
-            'minRANGE':-14.0,
-            'maxRANGE':14.0,
+            'minRANGE':0.0,
+            'maxRANGE':30.0,
             'stepRANGE':2.0,
             'unitsRANGE':'cm s-1',
             'cmapRANGE':'magma',
