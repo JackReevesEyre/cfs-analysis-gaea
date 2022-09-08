@@ -210,8 +210,8 @@ def plot_one_map(ds, ptype, pvar, mon):
     gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                        degree_symbol='')
     gl.yformatter = LatitudeFormatter(degree_symbol='')
-    ax.coastlines()
-    ax.add_feature(cfeature.LAND, facecolor='lightgray')
+    ax.coastlines(zorder=3)
+    ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
     
     # Define color map.
     cmap_b = plt.get_cmap(plot_dets(pvar, 'cmap', ptype))
@@ -351,7 +351,7 @@ def plot_dets(vn, att, pty=None):
             'mask_lim':2.0,
             'latname':'geolat_c',
             'lonname':'geolon_c',
-            'plotname':'SST',
+            'plotname':'ALONG-WIND CURRENT',
             'minRANGE':0.0,
             'maxRANGE':30.0,
             'stepRANGE':2.0,
