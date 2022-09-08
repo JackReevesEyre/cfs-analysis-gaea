@@ -226,7 +226,7 @@ def plot_one_map(ds, ptype, pvar, mon):
         dsm = ma.masked_where(ds['RANGE'].data < range_mask, ds[ptype].data)
         ptr = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data, -180.0),
                             ds[plot_dets(pvar, 'latname')].data,
-	        	    ds[ptype].data, alpha=0.5,
+	        	    ds[ptype].data, alpha=0.25,
                             transform=data_crs,
                             cmap=cmap_b, norm=norm_b, shading='nearest')
         p = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data, -180.0),
