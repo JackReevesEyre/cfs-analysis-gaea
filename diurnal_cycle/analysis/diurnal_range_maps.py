@@ -223,7 +223,7 @@ def plot_one_map(ds, ptype, pvar, mon):
                           cmap=cmap_b, norm=norm_b, shading='nearest')
     else:
         import numpy.ma as ma
-        dsm = ma.masked_where(ds['RANGE'].data > range_mask, ds[ptype].data)
+        dsm = ma.masked_where(ds['RANGE'].data < range_mask, ds[ptype].data)
         ptr = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data, -180.0),
                             ds[plot_dets(pvar, 'latname')].data,
 	        	    ds[ptype].data, alpha=0.5,
@@ -329,13 +329,13 @@ def plot_dets(vn, att, pty=None):
 	    'cmapPHASE':'twilight',
 	    'unitsPHASE':'local time',
 	    'minHALF_DEPTH':0.0,
-	    'maxHALF_DEPTH':40.0,
-	    'stepHALF_DEPTH':5.0,
+	    'maxHALF_DEPTH':20.0,
+	    'stepHALF_DEPTH':2.0,
 	    'cmapHALF_DEPTH':'magma',
 	    'unitsHALF_DEPTH':'m',
 	    'minPHASE_DELAY':0.0,
-	    'maxPHASE_DELAY':12.0,
-	    'stepPHASE_DELAY':1.0,
+	    'maxPHASE_DELAY':6.0,
+	    'stepPHASE_DELAY':0.5,
 	    'cmapPHASE_DELAY':'magma',
 	    'unitsPHASE_DELAY':'hours'
 
