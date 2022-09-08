@@ -87,7 +87,7 @@ def main(plot_month, plot_var, plot_type):
                                    np.radians(ds_stress_rec_mean['arctan_VoverU'].data),
                                    'math', exp_dim=(0,1))
             ds.attrs['input_files'] = file_list
-            ds_var = 'streamwise'
+            ds_var = 'U_streamwise'
         elif plot_var == 'TEMP':
             file_list = get_filelist('ocn', plot_month, ddir)
             ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[['temp']]
@@ -177,6 +177,12 @@ def main(plot_month, plot_var, plot_type):
     #local_m_utc = approx_local_time(ds)
     #ds['PHASE'] = (ds['PHASE'] - local_m_utc) % 24
     
+    # Convert all velocities to cm s-1.
+    if plot_var == 'CUR':
+        for v in ['RANGE']:
+            ds[v] = ds[v]*100.0
+            ds[v].attrs['units'] = 'cm s-1'
+
     # Plot.
     if plot_type == 'ALL':
         plot_all_maps(ds, plot_var, month_str)
@@ -339,7 +345,33 @@ def plot_dets(vn, att, pty=None):
 	    'cmapPHASE_DELAY':'magma',
 	    'unitsPHASE_DELAY':'hours'
 
-	}
+	},
+        'CUR':{
+            'latname':'geolat_c',
+            'lonname':'geolon_c',
+            'plotname':'SST',
+            'minRANGE':-3.0,
+            'maxRANGE':3.0,
+            'stepRANGE':0.5,
+            'unitsRANGE':'cm s-1',
+            'cmapRANGE':'magma',
+            'minPHASE':0.0,
+            'maxPHASE':24.0,
+            'stepPHASE':1.0,
+            'cmapPHASE':'twilight',
+            'unitsPHASE':'local time',
+            'minHALF_DEPTH':0.0,
+            'maxHALF_DEPTH':20.0,
+            'stepHALF_DEPTH':2.0,
+            'cmapHALF_DEPTH':'magma',
+            'unitsHALF_DEPTH':'m',
+            'minPHASE_DELAY':0.0,
+            'maxPHASE_DELAY':6.0,
+            'stepPHASE_DELAY':0.5,
+            'cmapPHASE_DELAY':'magma',
+            'unitsPHASE_DELAY':'hours'
+
+        }
     }
     #
     if att in ['min', 'max', 'cmap', 'step', 'units']:
