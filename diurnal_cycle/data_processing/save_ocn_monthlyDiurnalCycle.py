@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import datetime
 
-def main(year, month, xy_method):
+def main(year, month, xy_method, var_type):
 
     print('Processing ' + str(year) + '-' + str(month) + '...')
     
@@ -19,17 +19,26 @@ def main(year, month, xy_method):
         print('Warning: interpolation to points not currently supported north of 60N.')
     lons = switch_lon_lims(lons, min_lon=-280.0)
     
+    # Variable information.
+    if var_type == 'surface':
+        var_list = ['tau_x', 'tau_y', 'sens_heat', 'evap_heat', 
+                    'lw_heat', 'swflx', 'evap', 'pme']
+    elif var_type == '3D':
+        var_list = ['temp', 'salt', 'u', 'v']
+    else:
+        sys.exit('var_type not recognized, should be in {surface, 3D}')
+    
     if xy_method == 'points':
         t1 = datetime.datetime.now()
         ds = get_mon_di_cy_points(year, month, 
                                   lats, lons, z_lim,
-                                  interp_method)
+                                  interp_method, var_list)
         t2 = datetime.datetime.now()
         dt2 = t2 - t1
         print(f'Time taken to read with open_mfdataset: {dt2}')
     elif xy_method == 'grid':
         t1 = datetime.datetime.now()
-        ds = get_mon_di_cy_grid(year, month, z_lim)
+        ds = get_mon_di_cy_grid(year, month, z_lim, var_list)
         t2 = datetime.datetime.now()
         dt2 = t2 - t1
         print(f'Time taken to read with open_mfdataset: {dt2}')
@@ -53,7 +62,7 @@ def main(year, month, xy_method):
     # Save file.
     out_dir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/diurnal_cycle/'
     out_fn = 'ocn_' + "{:0>4d}".format(year) + '_' + "{:0>2d}".format(month) \
-        + '_' + xy_method + '_meanDiurnalCycle.nc'
+        + '_' + xy_method + '_' + var_type + '_meanDiurnalCycle.nc'
     ds.to_netcdf(path=out_dir + out_fn,
                  mode='w',format='NETCDF4',
                  encoding=encdg,unlimited_dims=['time'])
@@ -62,9 +71,8 @@ def main(year, month, xy_method):
 
 
 def get_mon_di_cy_points(yr, mn, lat_list, lon_list, max_depth,
-                         select_how, interp_how):
-
-    var_list = ['temp', 'salt', 'u', 'v']
+                         select_how, interp_how, var_list):
+    
     data_dir = '/lustre/f2/dev/ncep/JieShun.Zhu/CFSm501hr/CFSm501hr1980010200/DATA/'
     fn_root = 'ocn_' + "{:0>4d}".format(yr) +'_' + "{:0>2d}".format(mn)
     
@@ -77,7 +85,8 @@ def get_mon_di_cy_points(yr, mn, lat_list, lon_list, max_depth,
         xu_ocean=lon_list, yu_ocean=lat_list,
         method=interp_how
     )
-    ds_sub = ds_sub.sel(st_ocean=slice(0,max_depth))
+    if 'st_ocean' in ds_sub.keys():
+        ds_sub = ds_sub.sel(st_ocean=slice(0,max_depth))
     di_cy = ds_sub.groupby('time.hour')\
             .mean('time').chunk({'hour':24}).load()
     di_cy = di_cy.assign_coords({'time':np.datetime64(str(yr) + '-' + "{:0>2d}".format(mn), 's')})
@@ -96,9 +105,8 @@ def get_mon_di_cy_points(yr, mn, lat_list, lon_list, max_depth,
     return di_cy
 
 
-def get_mon_di_cy_grid(yr, mn, max_depth):
-
-    var_list = ['temp', 'salt', 'u', 'v']
+def get_mon_di_cy_grid(yr, mn, max_depth, var_list):
+    
     data_dir = '/lustre/f2/dev/ncep/JieShun.Zhu/CFSm501hr/CFSm501hr1980010200/DATA/'
     fn_root = 'ocn_' + "{:0>4d}".format(yr) +'_' + "{:0>2d}".format(mn)
 
@@ -107,7 +115,8 @@ def get_mon_di_cy_grid(yr, mn, max_depth):
 
     # Calculate mean diurnal cycle.
     ds_sub = ds_all[var_list]
-    ds_sub = ds_sub.sel(st_ocean=slice(0,max_depth))
+    if 'st_ocean' in ds_sub.keys():
+        ds_sub = ds_sub.sel(st_ocean=slice(0,max_depth))
     di_cy = ds_sub.groupby('time.hour')\
             .mean('time').chunk({'hour':24}).load()
     di_cy = di_cy.assign_coords({'time':np.datetime64(str(yr) + '-' + "{:0>2d}".format(mn), 's')})
@@ -116,8 +125,8 @@ def get_mon_di_cy_grid(yr, mn, max_depth):
     # Copy/add attributes.
     for v in var_list:
         di_cy[v].attrs = ds_sub[v].attrs
-        di_cy[v].attrs['cell_methods'] = \
-            'hour: mean within hours, time: mean over days (comment: monthly mean diurnal cycle)'
+        di_cy[v].attrs['cell_methods'] = di_cy[v].attrs['cell_methods'] + \
+            ', time: mean over days for each time of day (comment: monthly mean diurnal cycle)'
     di_cy.attrs = ds_sub.attrs
     di_cy.attrs['postprocessing'] = 'monthly mean diurnal cycle'
 
@@ -178,6 +187,7 @@ def switch_lon_lims(lon_list, min_lon=0.0):
 if __name__ == '__main__':
     cla = sys.argv
     xy = cla[1]
+    vt = cla[2]
     for yr in np.arange(2002, 2006):
         for mn in np.arange(1,13):
-            main(yr, mn, xy)
+            main(yr, mn, xy, vt)

@@ -64,7 +64,7 @@ def main(plot_month, plot_var, plot_type):
     # Construct file name and open it if it exists.
     dicy_fn = 'meanDiurnalCycle_metrics_' + plot_var + '_' + month_str + '.nc'
     try:
-        ds = xr.open_dataset(ddir + dicy_fn)
+        ds = xr.open_dataset(ddir + dicy_fn, decode_timedelta=False)
     except:
         # If it doesn't exist, construct it:
         
@@ -74,17 +74,17 @@ def main(plot_month, plot_var, plot_type):
             ds = xr.open_mfdataset(file_list)[['UGRD', 'VGRD']].sel(height=10.0)
             ds.attrs['input_files'] = file_list
         elif plot_var == 'CUR':
-            atmo_file_list = get_filelist('atmo', plot_month, ddir)
+            surface_file_list = get_filelist('surface', plot_month, ddir)
             # Or maybe should be:
-            #atmo_file_list = get_filelist('atmo', 'ANN', ddir)
-            ds_atmo_rec_mean = xr.open_mfdataset(atmo_file_list)[['UGRD', 'VGRD']]\
-            .sel(height=10.0).mean(dim=['time','hour'], keep_attrs=True)
+            #surface_file_list = get_filelist('surface', 'ANN', ddir)
+            ds_stress_rec_mean = xr.open_mfdataset(surface_file_list)[['tau_x', 'tau_y']]\
+            .mean(dim=['time','hour'], keep_attrs=True)
             file_list = get_filelist('ocn', plot_month, ddir)
             ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[['u', 'v']]
             # Calculate down-wind current.
-            ds_atmo_rec_mean = utils.wind_dir_twice(ds_atmo_rec_mean, 'UGRD', 'VGRD')
+            ds_stress_rec_mean = utils.wind_dir_twice(ds_stress_rec_mean, 'tau_x', 'tau_y')
             ds = utils.rotation_xy(ds, 'u', 'v',
-                                   np.radians(ds_atmo_rec_mean['arctan_VoverU'].data),
+                                   np.radians(ds_stress_rec_mean['arctan_VoverU'].data),
                                    'math', exp_dim=(0,1))
             ds.attrs['input_files'] = file_list
             ds_var = 'streamwise'
@@ -171,6 +171,11 @@ def main(plot_month, plot_var, plot_type):
         ds_out.to_netcdf(path=ddir + dicy_fn,
                          mode='w',format='NETCDF4',
                          encoding=nc_enc)
+
+    # Add PHASE in UTC.
+    #print('WARNING: converting PHASE to UTC.')
+    #local_m_utc = approx_local_time(ds)
+    #ds['PHASE'] = (ds['PHASE'] - local_m_utc) % 24
     
     # Plot.
     if plot_type == 'ALL':
@@ -181,6 +186,9 @@ def main(plot_month, plot_var, plot_type):
 
 
 def plot_one_map(ds, ptype, pvar, mon):
+    
+    # Define whether and where to mask fields according to diurnal range.
+    range_mask = 0.0
     
     # Set up figure and axes.
     fig = plt.figure(figsize=(8, 6))
@@ -207,12 +215,25 @@ def plot_one_map(ds, ptype, pvar, mon):
                                  ncolors=cmap_b.N)
     
     # Plot the data.
-    import pdb; pdb.set_trace()
-    p = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data, -180.0),
-                      ds[plot_dets(pvar, 'latname')].data,
-		      ds[ptype].data,
-                      transform=data_crs,
-                      cmap=cmap_b, norm=norm_b, shading='nearest')
+    if ((ptype == 'RANGE') or (range_mask == 0.0)):
+        p = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data, -180.0),
+                          ds[plot_dets(pvar, 'latname')].data,
+	        	  ds[ptype].data,
+                          transform=data_crs,
+                          cmap=cmap_b, norm=norm_b, shading='nearest')
+    else:
+        import numpy.ma as ma
+        dsm = ma.masked_where(ds['RANGE'].data > range_mask, ds[ptype].data)
+        ptr = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data, -180.0),
+                            ds[plot_dets(pvar, 'latname')].data,
+	        	    ds[ptype].data, alpha=0.5,
+                            transform=data_crs,
+                            cmap=cmap_b, norm=norm_b, shading='nearest')
+        p = ax.pcolormesh(switch_lon_lims(ds[plot_dets(pvar, 'lonname')].data, -180.0),
+                          ds[plot_dets(pvar, 'latname')].data,
+	        	  dsm,
+                          transform=data_crs,
+                          cmap=cmap_b, norm=norm_b, shading='nearest')
     
     # Finish up figure.
     ax.set_title(plot_dets(pvar, 'plotname') + ' DIURNAL CYCLE ' + ptype
@@ -261,10 +282,15 @@ def approx_local_time(ds):
 def get_filelist(comp, plot_month, ddir):
     if comp == 'atmo':
         comp_str = 'atmo'
+        end_str = ')_grid_meanDiurnalCycle.nc'
     elif comp == 'ocn':
         comp_str = 'ocn'
+        end_str = ')_grid_meanDiurnalCycle.nc'
+    elif comp == 'surface':
+        comp_str = 'ocn'
+        end_str = ')_grid_surface_meanDiurnalCycle.nc'
     else:
-        sys.exit('comp not recognized as model component -- try atmo or ocn')
+        sys.exit('model component not recognized, comp must be {atmo, surface, ocn}')
 
     # Construct regex.
     if plot_month == 'ANN':
@@ -273,7 +299,7 @@ def get_filelist(comp, plot_month, ddir):
         plot_month_list = np.array(plot_month.split(','), dtype=int)
         pattern = '^' + comp_str + '_.*_(' + \
             '|'.join("{:02d}".format(m) for m in plot_month_list) + \
-            ')_grid_meanDiurnalCycle.nc'
+            end_str
 
     # Get list of matching files.
     result = []
@@ -293,8 +319,8 @@ def plot_dets(vn, att, pty=None):
 	    'lonname':'geolon_t',
 	    'plotname':'SST',
 	    'minRANGE':0.0,
-	    'maxRANGE':1.5,
-	    'stepRANGE':0.125,
+	    'maxRANGE':1.0,
+	    'stepRANGE':0.1,
 	    'unitsRANGE':'K',
 	    'cmapRANGE':'magma',
 	    'minPHASE':0.0,
