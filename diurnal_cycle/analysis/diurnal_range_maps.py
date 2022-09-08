@@ -210,7 +210,7 @@ def plot_one_map(ds, ptype, pvar, mon):
     gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                        degree_symbol='')
     gl.yformatter = LatitudeFormatter(degree_symbol='')
-    ax.coastlines(zorder=3)
+    ax.coastlines(zorder=4)
     ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
     
     # Define color map.
