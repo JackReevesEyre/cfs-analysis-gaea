@@ -188,7 +188,7 @@ def main(plot_month, plot_var, plot_type):
 def plot_one_map(ds, ptype, pvar, mon):
     
     # Define whether and where to mask fields according to diurnal range.
-    range_mask = 0.0
+    range_mask = 0.1
     
     # Set up figure and axes.
     fig = plt.figure(figsize=(8, 6))
