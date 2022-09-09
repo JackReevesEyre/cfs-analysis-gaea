@@ -121,10 +121,13 @@ def main(plot_month, plot_var, plot_type):
             iHALF = iHALF.where(iHALF >= 0, other=0)
             ds['RANGE'] = RANGE_3D.isel(st_ocean=0)*nan_hr_mask
             ds['PHASE'] = PHASE_3D.isel(st_ocean=0)*nan_hr_mask
+            ds['RANGE_25'] = RANGE_3D.sel(st_ocean=25.0)*nan_hr_mask
+            ds['PHASE_25'] = PHASE_3D.sel(st_ocean=25.0)*nan_hr_mask
             ds['HALF_DEPTH'] = ds.st_ocean[iHALF]*nan_hr_mask
             ds['PHASE_DELAY'] = (PHASE_3D.isel(st_ocean=iHALF) 
                                  - PHASE_3D.isel(st_ocean=0))*nan_hr_mask % 24
-            ds_out = ds[['RANGE', 'PHASE', 'HALF_DEPTH', 'PHASE_DELAY']]
+            ds_out = ds[['RANGE', 'PHASE', 'HALF_DEPTH', 'PHASE_DELAY',
+                         'RANGE_25', 'PHASE_25']]
         else:
             ds['RANGE'] = (ds[ds_var].max(dim='hour') 
                            - ds[ds_var].min(dim='hour')).compute()*nan_hr_mask
@@ -136,7 +139,7 @@ def main(plot_month, plot_var, plot_type):
         # Save out data.
         ds_out['RANGE'].attrs = {
             'long_name':'range of mean diurnal cycle',
-            'units':'K',
+            'units':ds[ds_var].attrs['units'],
             'variable':ds[ds_var].attrs['long_name'],
             'cell_methods':month_str + ' mean over years & months for each hour of day; (max - min) over hours of day.',
             'time_period':month_str + ' 2002-2005' 
@@ -158,6 +161,20 @@ def main(plot_month, plot_var, plot_type):
             }
             ds_out['PHASE_DELAY'].attrs = {
                 'long_name':'delay of time of diurnal cycle maximum at HALF_DEPTH after maximum at surface',
+                'units':'hours',
+                'variable':ds[ds_var].attrs['long_name'],
+                'cell_methods':month_str + ' mean over years & months for each hour of day ; (max - min) over hours of day.',
+                'time_period':month_str + ' 2002-2005'
+            }
+            ds_out['RANGE_25'].attrs = {
+                'long_name':'range of mean diurnal cycle at 25 m depth',
+                'units':ds[ds_var].attrs['units'],
+                'variable':ds[ds_var].attrs['long_name'],
+                'cell_methods':month_str +  ' mean over years & months for each hour of day; (max - min) over hours of day.',
+                'time_period':month_str + ' 2002-2005'
+            }
+            ds_out['PHASE_25'].attrs = {
+                'long_name':'local time of diurnal cycle maximum at 25 m depth',
                 'units':'hours',
                 'variable':ds[ds_var].attrs['long_name'],
                 'cell_methods':month_str + ' mean over years & months for each hour of day ; (max - min) over hours of day.',
