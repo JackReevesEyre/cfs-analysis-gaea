@@ -199,7 +199,7 @@ def main(plot_month, plot_var, plot_type):
         for v in ['RANGE']:
             ds[v] = ds[v]*100.0
             ds[v].attrs['units'] = 'cm s-1'
-
+    
     # Plot.
     if plot_type == 'ALL':
         plot_all_maps(ds, plot_var, month_str)
@@ -347,11 +347,21 @@ def plot_dets(vn, att, pty=None):
 	    'stepRANGE':0.1,
 	    'unitsRANGE':'K',
 	    'cmapRANGE':'magma',
-	    'minPHASE':0.0,
+	    'minRANGE_25':0.0,
+            'maxRANGE_25':0.5,
+            'stepRANGE_25':0.05,
+            'unitsRANGE_25':'K',
+            'cmapRANGE_25':'magma',
+            'minPHASE':0.0,
 	    'maxPHASE':24.0,
 	    'stepPHASE':1.0,
 	    'cmapPHASE':'twilight',
 	    'unitsPHASE':'local time',
+            'minPHASE_25':0.0,
+            'maxPHASE_25':24.0,
+            'stepPHASE_25':1.0,
+            'cmapPHASE_25':'twilight',
+            'unitsPHASE_25':'local time',
 	    'minHALF_DEPTH':0.0,
 	    'maxHALF_DEPTH':20.0,
 	    'stepHALF_DEPTH':2.0,
@@ -375,8 +385,8 @@ def plot_dets(vn, att, pty=None):
             'unitsRANGE':'cm s-1',
             'cmapRANGE':'magma',
             'minRANGE_25':0.0,
-            'maxRANGE_25':2.0,
-            'stepRANGE_25':0.1,
+            'maxRANGE_25':0.2,
+            'stepRANGE_25':0.01,
             'unitsRANGE_25':'cm s-1',
             'cmapRANGE_25':'magma',
             'minPHASE':0.0,
