@@ -211,7 +211,7 @@ def main(plot_month, plot_var, plot_type):
 def plot_one_map(ds, ptype, pvar, mon):
     
     # Define whether and where to mask fields according to diurnal range.
-    range_mask = plot_dets(pvar, 'mask_lim')
+    range_mask = 0.0 #plot_dets(pvar, 'mask_lim')
     
     # Set up figure and axes.
     fig = plt.figure(figsize=(8, 6))
@@ -375,8 +375,8 @@ def plot_dets(vn, att, pty=None):
             'unitsRANGE':'cm s-1',
             'cmapRANGE':'magma',
             'minRANGE_25':0.0,
-            'maxRANGE_25':15.0,
-            'stepRANGE_25':1.0,
+            'maxRANGE_25':2.0,
+            'stepRANGE_25':0.1,
             'unitsRANGE_25':'cm s-1',
             'cmapRANGE_25':'magma',
             'minPHASE':0.0,
