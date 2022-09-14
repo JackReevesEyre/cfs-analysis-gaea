@@ -30,7 +30,7 @@ import utils
 from diurnal_range_maps import switch_lon_lims, get_filelist
 #------------------------------------------------------------------------------
 
-def main(plot_month, plot_var):
+def main(plot_month, plot_var, plot_hr):
     
     """ For reference:
     Atmo dimensions:    (time: 1, hour: 24, height: 1, lat: 190, lon: 384)
@@ -72,13 +72,15 @@ def main(plot_month, plot_var):
         file_list = get_filelist('ocn', plot_month, ddir)
         ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[[plot_var]]
         ds.attrs['input_files'] = file_list
-        ds = ds.isel(st_ocean=0).mean(dim='time', keep_attrs=True).max(dim='hour', keep_attrs=True) - \
-            ds.isel(st_ocean=0).mean(dim='time', keep_attrs=True).min(dim='hour', keep_attrs=True)
+        #ds = ds.isel(st_ocean=0).mean(dim='time', keep_attrs=True).max(dim='hour', keep_attrs=True) - \
+        #    ds.isel(st_ocean=0).mean(dim='time', keep_attrs=True).min(dim='hour', keep_attrs=True)
+        ds = ds.isel(st_ocean=0, hour=int(plot_hr)).mean(dim='time', keep_attrs=True)
         ds[plot_var] = ds[plot_var]*100.0
         ds[plot_var].attrs['units'] = 'cm s-1'
         ds[plot_var].attrs['long_name'] = {'u':'eastward current', 
                                            'v':'northward current'}[plot_var]
-        plot_title = 'diurnal range of ' + plot_dets(plot_var, 'plotname') + ' at ' + \
+        plot_title = "{:0>2d}".format(int(ds.hour.data)) + '.00 UTC ' + \
+            plot_dets(plot_var, 'plotname') + ' at ' + \
             str(ds.st_ocean.data) + ' m, ' + month_str
     else:
         sys.exit('plot_var not recognized.')
@@ -124,7 +126,8 @@ def main(plot_month, plot_var):
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
-    plotfn = 'current_check_map_diurnal_range_' + plot_var + '_' + month_str + '.'
+    plotfn = 'current_check_map_hour_' + "{:0>2d}".format(int(ds.hour.data)) +\
+        '_' + plot_var + '_' + month_str + '.'
     plotfileformat='png'
     plt.savefig(plotdir + plotfn + plotfileformat, format=plotfileformat,
                 dpi=400)
@@ -138,9 +141,9 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'eastward wind stress',
-	    'min':-0.05, #-0.3,
-	    'max':0.05, #0.3,
-	    'step':0.005, #0.05,
+	    'min':-0.3,
+	    'max':0.3,
+	    'step':0.05,
 	    'units':'N m-2',
 	    'cmap':'BrBg'
 	},
@@ -158,9 +161,9 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'eastward current',
-	    'min':-30.0, #-100.0,
-	    'max':30.0, #100.0,
-	    'step':2.0, #20.0,
+	    'min':-100.0,
+	    'max':100.0,
+	    'step':20.0,
 	    'units':'cm s-1',
 	    'cmap':'BrBg'
 	},
@@ -168,9 +171,9 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'northward current',
-	    'min':-20.0, #-30.0,
-	    'max':20.0,
-	    'step':2.0, #5.0,
+	    'min':-30.0,
+	    'max':30.0,
+	    'step':5.0,
 	    'units':'cm s-1',
 	    'cmap':'BrBg'
 	}
@@ -182,4 +185,4 @@ def plot_dets(vn, att):
 
 
 if __name__ == "__main__": 
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2], sys.argv[3])
