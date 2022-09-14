@@ -61,10 +61,11 @@ def main(plot_month, plot_var):
     
     # Load data.
     if plot_var in ['tau_x', 'tau_y']:
-        surface_file_list = get_filelist('surface', plot_month, ddir)
+        file_list = get_filelist('surface', plot_month, ddir)
         ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[[plot_var]]
         ds.attrs['input_files'] = file_list
         ds = ds.mean(dim=['time','hour'], keep_attrs=True)
+        plot_title = plot_dets(plot_var, 'plotname') + ', ' + month_str
     elif plot_var in ['u', 'v']:
         file_list = get_filelist('ocn', plot_month, ddir)
         ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[[plot_var]]
@@ -74,6 +75,8 @@ def main(plot_month, plot_var):
         ds[plot_var].attrs['units'] = 'cm s-1'
         ds[plot_var].attrs['long_name'] = {'u':'eastward current', 
                                            'v':'northward current'}[plot_var]
+        plot_title = plot_dets(plot_var, 'plotname') + ' at ' + \
+            str(ds.st_ocean.data) + ' m, ' + month_str
     else:
         sys.exit('plot_var not recognized.')
     
@@ -110,8 +113,7 @@ def main(plot_month, plot_var):
                       cmap=cmap_b, norm=norm_b, shading='nearest')
     
     # Finish up figure.
-    ax.set_title(plot_dets(plot_var, 'plotname') + ' at ' + 
-                 str(ds.st_ocean.data) + ' m, ' + month_str)
+    ax.set_title(plot_title)
     fig.colorbar(p,
                  label=ds[plot_var].attrs['long_name'] + ' (' +
 		     ds[plot_var].attrs['units'] + ')',
