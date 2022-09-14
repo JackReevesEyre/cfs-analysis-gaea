@@ -64,8 +64,10 @@ def main(plot_month, plot_var):
         file_list = get_filelist('surface', plot_month, ddir)
         ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[[plot_var]]
         ds.attrs['input_files'] = file_list
-        ds = ds.mean(dim=['time','hour'], keep_attrs=True)
-        plot_title = plot_dets(plot_var, 'plotname') + ', ' + month_str
+        #ds = ds.mean(dim=['time','hour'], keep_attrs=True)
+        ds = ds.mean(dim='time', keep_attrs=True).max(dim='hour', keep_attrs=True) - \
+            ds.mean(dim='time', keep_attrs=True).min(dim='hour', keep_attrs=True)
+        plot_title = 'diurnal range of ' + plot_dets(plot_var, 'plotname') + ', ' + month_str
     elif plot_var in ['u', 'v']:
         file_list = get_filelist('ocn', plot_month, ddir)
         ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[[plot_var]]
@@ -115,13 +117,13 @@ def main(plot_month, plot_var):
     # Finish up figure.
     ax.set_title(plot_title)
     fig.colorbar(p,
-                 label=ds[plot_var].attrs['long_name'] + ' (' +
-		     ds[plot_var].attrs['units'] + ')',
+                 label=plot_dets(plot_var, 'plotname') + ' (' +
+		     plot_dets(plot_var, 'units') + ')',
                  ax=ax, orientation='horizontal',shrink=0.5)
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
-    plotfn = 'current_check_map_' + plot_var + '_' + month_str + '.'
+    plotfn = 'current_check_map_diurnal_range_' + plot_var + '_' + month_str + '.'
     plotfileformat='png'
     plt.savefig(plotdir + plotfn + plotfileformat, format=plotfileformat,
                 dpi=400)
@@ -135,9 +137,9 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'eastward wind stress',
-	    'min':-0.3,
-	    'max':0.3,
-	    'step':0.05,
+	    'min':-0.05, #-0.3,
+	    'max':0.05, #0.3,
+	    'step':0.005, #0.05,
 	    'units':'N m-2',
 	    'cmap':'BrBg'
 	},
