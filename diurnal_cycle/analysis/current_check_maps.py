@@ -72,12 +72,13 @@ def main(plot_month, plot_var):
         file_list = get_filelist('ocn', plot_month, ddir)
         ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[[plot_var]]
         ds.attrs['input_files'] = file_list
-        ds = ds.isel(st_ocean=0).mean(dim=['time','hour'], keep_attrs=True)
+        ds = ds.isel(st_ocean=0).mean(dim='time', keep_attrs=True).max(dim='hour', keep_attrs=True) - \
+            ds.isel(st_ocean=0).mean(dim='time', keep_attrs=True).min(dim='hour', keep_attrs=True)
         ds[plot_var] = ds[plot_var]*100.0
         ds[plot_var].attrs['units'] = 'cm s-1'
         ds[plot_var].attrs['long_name'] = {'u':'eastward current', 
                                            'v':'northward current'}[plot_var]
-        plot_title = plot_dets(plot_var, 'plotname') + ' at ' + \
+        plot_title = 'diurnal range of ' + plot_dets(plot_var, 'plotname') + ' at ' + \
             str(ds.st_ocean.data) + ' m, ' + month_str
     else:
         sys.exit('plot_var not recognized.')
@@ -157,9 +158,9 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'eastward current',
-	    'min':-100.0,
-	    'max':100.0,
-	    'step':20.0,
+	    'min':-30.0, #-100.0,
+	    'max':30.0, #100.0,
+	    'step':2.0, #20.0,
 	    'units':'cm s-1',
 	    'cmap':'BrBg'
 	},
@@ -167,9 +168,9 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'northward wind',
-	    'min':-30.0,
-	    'max':30.0,
-	    'step':5.0,
+	    'min':-20.0, #-30.0,
+	    'max':20.0,
+	    'step':2.0, #5.0,
 	    'units':'cm s-1',
 	    'cmap':'BrBg'
 	}
