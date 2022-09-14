@@ -135,9 +135,9 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'eastward wind stress',
-	    'min':0.0,
-	    'max':0.4,
-	    'step':0.025,
+	    'min':-0.3,
+	    'max':0.3,
+	    'step':0.05,
 	    'units':'N m-2',
 	    'cmap':'BrBg'
 	},
@@ -145,8 +145,8 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'northward wind stress',
-	    'min':0.0,
-	    'max':0.4,
+	    'min':-0.2,
+	    'max':0.2,
 	    'step':0.025,
 	    'units':'N m-2',
 	    'cmap':'BrBg'
@@ -165,9 +165,9 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'northward wind',
-	    'min':-100.0,
-	    'max':100.0,
-	    'step':20.0,
+	    'min':-30.0,
+	    'max':30.0,
+	    'step':5.0,
 	    'units':'cm s-1',
 	    'cmap':'BrBg'
 	}
