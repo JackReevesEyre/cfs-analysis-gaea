@@ -167,7 +167,7 @@ def plot_dets(vn, att):
         'v':{
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
-	    'plotname':'northward wind',
+	    'plotname':'northward current',
 	    'min':-20.0, #-30.0,
 	    'max':20.0,
 	    'step':2.0, #5.0,
