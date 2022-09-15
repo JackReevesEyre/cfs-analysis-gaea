@@ -98,6 +98,7 @@ def main(plot_month, plot_var):
     
     # Set up figure and axes.
     fig, ax = plt.subplots(1, 1, figsize=(8, 5))
+    plt.subplots_adjust(right=0.8)
     ax.set_xlim(-0.5, 23.5)
     ax.set_xlabel('hour (UTC)')
     ax.set_ylabel('current velocity (cm s-1)')
