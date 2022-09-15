@@ -97,9 +97,10 @@ def main(plot_month, plot_var):
         sys.exit('plot_var not recognized.')
     
     # Set up figure and axes.
-    fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+    fig, ax = plt.subplots(1, 1, figsize=(8, 5))
     ax.set_xlim(-0.5, 23.5)
     ax.set_xlabel('hour (UTC)')
+    ax.set_ylabel('current velocity (cm s-1)')
 
     # Define color map.
     cmap_b = cm.get_cmap('tab20')
@@ -107,17 +108,20 @@ def main(plot_month, plot_var):
     # Plot data.
     for ilat, lat in enumerate(ds.yu_ocean.data):
         lnwid = 1.5 if lat == max_point.yu_ocean.data[0] else 0.75
-        ax.plot(ds.hour.data,
-                ds[plot_var].sel(yu_ocean=lat).data,
-                color=cmap_b(ilat), linewidth=lnwid,
-                label="{:+.2f}".format(ds.geolat_c.sel(yu_ocean=lat).data))
+        if np.all(np.isnan(ds[plot_var].sel(yu_ocean=lat).data)):
+            continue
+        else:
+            ax.plot(ds.hour.data,
+                    ds[plot_var].sel(yu_ocean=lat).data,
+                    color=cmap_b(ilat), linewidth=lnwid,
+                    label="{:+.2f}".format(ds.geolat_c.sel(yu_ocean=lat).data))
     
     # Finish up figure.
     ax.set_title(plot_title, loc='left')
     ax.set_title('longitude: ' + 
-                 str(ds.geolon_c.sel(yu_ocean=max_point.yu_ocean.data[0])), 
+                 str(ds.geolon_c.sel(yu_ocean=max_point.yu_ocean.data[0]).data), 
                  loc='right')
-    ax.legend(ncol=1, loc='right')
+    ax.legend(ncol=1, loc='center left', bbox_to_anchor=(1.0, 0.5))
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
