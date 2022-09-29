@@ -74,12 +74,15 @@ def main(plot_month, plot_var, plot_hr):
         ds.attrs['input_files'] = file_list
         #ds = ds.isel(st_ocean=0).mean(dim='time', keep_attrs=True).max(dim='hour', keep_attrs=True) - \
         #    ds.isel(st_ocean=0).mean(dim='time', keep_attrs=True).min(dim='hour', keep_attrs=True)
-        ds = ds.isel(st_ocean=0, hour=int(plot_hr)).mean(dim='time', keep_attrs=True)
+        ds = ds.isel(st_ocean=0, hour=int(plot_hr)).mean(dim='time', keep_attrs=True) - \
+            ds.isel(st_ocean=0, hour=int((int(plot_hr) + 12)%24)).mean(dim='time', keep_attrs=True)
         ds[plot_var] = ds[plot_var]*100.0
         ds[plot_var].attrs['units'] = 'cm s-1'
         ds[plot_var].attrs['long_name'] = {'u':'eastward current', 
                                            'v':'northward current'}[plot_var]
-        plot_title = "{:0>2d}".format(int(ds.hour.data)) + '.00 UTC ' + \
+        print(ds)
+        plot_title = "{:0>2d}".format(int(plot_hr)) + '.00 UTC - ' + \
+            "{:0>2d}".format(int((int(plot_hr) + 12)%24)) + '.00 UTC ' + \
             plot_dets(plot_var, 'plotname') + ' at ' + \
             str(ds.st_ocean.data) + ' m, ' + month_str
     else:
@@ -126,8 +129,8 @@ def main(plot_month, plot_var, plot_hr):
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
-    plotfn = 'current_check_map_hour_' + "{:0>2d}".format(int(ds.hour.data)) +\
-        '_' + plot_var + '_' + month_str + '.'
+    plotfn = 'current_check_map_hour_' + "{:0>2d}".format(int(plot_hr)) +\
+        '_12hourdiff_' + plot_var + '_' + month_str + '.'
     plotfileformat='png'
     plt.savefig(plotdir + plotfn + plotfileformat, format=plotfileformat,
                 dpi=400)
@@ -161,8 +164,8 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'eastward current',
-	    'min':-100.0,
-	    'max':100.0,
+	    'min':-10.0,
+	    'max':10.0,
 	    'step':20.0,
 	    'units':'cm s-1',
 	    'cmap':'BrBg'
