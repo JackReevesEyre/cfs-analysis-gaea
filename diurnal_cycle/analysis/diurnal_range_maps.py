@@ -46,6 +46,9 @@ def main(plot_month, plot_var, plot_type):
     ocn_chunks = {'time':48, 'hour':24, 'st_ocean':20, 'yt_ocean':10,
                   'xt_ocean':20, 'yu_ocean':10, 'xu_ocean':20}
     
+    # Specify depth used as reference in current shear calculation.
+    curr_shear_depth = 60.0
+    
     # Construct month string.
     if plot_month == 'ANN':
         month_str = 'ANN'
@@ -72,6 +75,8 @@ def main(plot_month, plot_var, plot_type):
         if plot_var == 'WIND':
             file_list = get_filelist('atmo', plot_month, ddir)
             ds = xr.open_mfdataset(file_list)[['UGRD', 'VGRD']].sel(height=10.0)
+            # Take time average.
+            ds = ds.mean(dim='time', keep_attrs=True)
             ds.attrs['input_files'] = file_list
         elif plot_var == 'CUR':
             surface_file_list = get_filelist('surface', plot_month, ddir)
@@ -86,19 +91,28 @@ def main(plot_month, plot_var, plot_type):
             ds = utils.rotation_xy(ds, 'u', 'v',
                                    np.radians(ds_stress_rec_mean['arctan_VoverU'].data),
                                    'math', exp_dim=(0,1))
+            # Take time average.
+            ds = ds.mean(dim='time', keep_attrs=True)
+            # Convert to shear, relative to a fixed depth.
+            z = ds.st_ocean.data
+            st_ocean_base = np.nanmax(z[z <= curr_shear_depth])
+            xr.set_options(keep_attrs=True)
+            for varname in ['u','v','U_streamwise','U_crossstream']:
+                ds[varname] = ds[varname] \
+                    - ds[varname].sel(st_ocean=st_ocean_base)
+            xr.set_options(keep_attrs=False)
             ds.attrs['input_files'] = file_list
             ds_var = 'U_streamwise'
         elif plot_var == 'TEMP':
             file_list = get_filelist('ocn', plot_month, ddir)
             ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[['temp']]
+            # Take time average.
+            ds = ds.mean(dim='time', keep_attrs=True)
             ds.attrs['input_files'] = file_list
             ds_var = 'temp'
         else:
             sys.exit('plot_var not recognized.')
-        
-        # Take time average. 
-        ds = ds.mean(dim='time', keep_attrs=True)
-        
+         
         # Change NaN to an unrealistic value.
         # (Some of the functions below cannot handle all-NaN slices.)
         nan_hr_mask = xr.where(
@@ -196,7 +210,7 @@ def main(plot_month, plot_var, plot_type):
     
     # Convert all velocities to cm s-1.
     if plot_var == 'CUR':
-        for v in ['RANGE']:
+        for v in ['RANGE', 'RANGE_25']:
             ds[v] = ds[v]*100.0
             ds[v].attrs['units'] = 'cm s-1'
     
@@ -291,8 +305,8 @@ def switch_lon_lims(lon_list, min_lon=0.0):
 def approx_local_time(ds):
     if 'geolon_t' in ds.keys():
         lon = ds['geolon_t']
-    elif 'geolon_u' in ds.keys():
-        lon = ds['geolon_u']
+    elif 'geolon_c' in ds.keys():
+        lon = ds['geolon_c']
     else:
         print('longitude variable not found.')
         print(ds)
