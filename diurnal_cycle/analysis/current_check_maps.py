@@ -166,7 +166,7 @@ def plot_dets(vn, att):
 	    'plotname':'eastward current',
 	    'min':-10.0,
 	    'max':10.0,
-	    'step':20.0,
+	    'step':2.0,
 	    'units':'cm s-1',
 	    'cmap':'BrBg'
 	},
