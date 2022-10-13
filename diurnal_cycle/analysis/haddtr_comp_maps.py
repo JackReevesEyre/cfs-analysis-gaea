@@ -95,11 +95,11 @@ def main(plot_month):
                   dict(map_projection=plot_crs))
     axgr = AxesGrid(fig, 111, axes_class=axes_class,
                     nrows_ncols=(2, 2),
-                    axes_pad=(0.25,1.0),
+                    axes_pad=(0.25,0.5),
                     cbar_location='bottom',
                     cbar_mode='edge',
                     cbar_pad=0.25,
-                    cbar_size='2%',
+                    cbar_size='10%',
                     label_mode='')
     
     # Define color maps.
@@ -126,7 +126,7 @@ def main(plot_month):
         # Add features.
         ax.set_global()
         gl = ax.gridlines(draw_labels=True,
-                          ylabel_style={'rotation':45.0},
+                          xlabel_style={'rotation':45.0},
                           xlocs=np.arange(-300, 151, 60),
                           ylocs=np.arange(-90, 91, 30),
                           linewidths=0.3)
@@ -164,11 +164,9 @@ def main(plot_month):
     
     # Add colorbars.
     cba = axgr.cbar_axes[0].colorbar(plots['abs'], 
-                                     pad=0.35, shrink=0.6, aspect=10,
                                      extend='max',
                                      label='SST diurnal range (K)')
     cbd = axgr.cbar_axes[1].colorbar(plots['diff'], 
-                                     pad=0.35, shrink=0.6, aspect=10,
                                      extend='both',
                                      label='SST diurnal range difference (K)')
     
