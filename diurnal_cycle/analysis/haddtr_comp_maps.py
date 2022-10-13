@@ -90,15 +90,15 @@ def main(plot_month):
     # Set up figure and axes.
     data_crs = ccrs.PlateCarree()
     plot_crs = ccrs.Robinson(central_longitude=-150)
-    fig = plt.figure(figsize=(9, 8))
+    fig = plt.figure(figsize=(9, 6))
     axes_class = (GeoAxes,
                   dict(map_projection=plot_crs))
     axgr = AxesGrid(fig, 111, axes_class=axes_class,
                     nrows_ncols=(2, 2),
-                    axes_pad=0.25,
+                    axes_pad=(0.25,1.0),
                     cbar_location='bottom',
                     cbar_mode='edge',
-                    cbar_pad=0.1,
+                    cbar_pad=0.25,
                     cbar_size='2%',
                     label_mode='')
     
@@ -111,6 +111,7 @@ def main(plot_month):
                                  ncolors=cmap_d.N)
     
     # Loop over axes and plot each.
+    plots=  {}
     for i, ax in enumerate(axgr):
         print(i)
         plot_dict = plot_data[i]
@@ -121,7 +122,7 @@ def main(plot_month):
         else:
             latm = dsr.geolat_t.data
             lonm = switch_lon_lims(dsr.geolon_t.data, -180.0)
-        import pdb; pdb.set_trace()    
+         
         # Add features.
         ax.set_global()
         gl = ax.gridlines(draw_labels=True,
@@ -136,17 +137,38 @@ def main(plot_month):
         ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
         
         # Plot the data.
-        p = ax.pcolormesh(lonm, latm,
-	        	  plot_dict['data'].data,
-                          transform=data_crs,
-                          cmap=cmap_d if plot_dict['colb'] == 'diff' else cmap_b,
-                          norm=norm_d if plot_dict['colb'] == 'diff' else norm_b,
-                          shading='nearest')
+        plots[plot_dict['colb']] = ax.pcolormesh(
+            lonm, latm,
+	    plot_dict['data'].data,
+            transform=data_crs,
+            cmap=cmap_d if plot_dict['colb'] == 'diff' else cmap_b,
+            norm=norm_d if plot_dict['colb'] == 'diff' else norm_b,
+            shading='nearest')
         
         # Add title.
         ax.set_title(plot_dict['title'])
         
-    # Add colorbars?
+        # Sort ticklabels.
+        if i in [0, 1]:
+            ax.xaxis.set_tick_params(which='both', labelrotation=45,
+                                     labelbottom=False, labeltop=True)
+        else:
+            ax.xaxis.set_tick_params(which='both', labelrotation=45,
+                                     labelbottom=True, labeltop=False)
+        if i in [0, 2]:
+            ax.yaxis.set_tick_params(which='both',
+                                     labelleft=True, labelright=False)
+        else:
+            ax.yaxis.set_tick_params(which='both',
+                                     labelleft=False, labelright=True)
+
+    # Add colorbars.
+    cba = axgr.cbar_axes[0].colorbar(plots['abs'], 
+                                     pad=0.25, 
+                                     label='SST diurnal range (K)')
+    cbd = axgr.cbar_axes[1].colorbar(plots['diff'], 
+                                     pad=0.25,
+                                     label='SST diurnal range difference (K)')
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
