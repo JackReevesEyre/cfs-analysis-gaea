@@ -83,7 +83,7 @@ def main(plot_month):
          'colb':'diff',
          'grid':'had'}
     ]
-    import pdb; pdb.set_trace()
+    
     #-----------
     # Plot maps.
     
@@ -98,7 +98,7 @@ def main(plot_month):
                     axes_pad=(0.25,0.5),
                     cbar_location='bottom',
                     cbar_mode='edge',
-                    cbar_pad=0.25,
+                    cbar_pad=0.5,
                     cbar_size='10%',
                     label_mode='')
     
@@ -150,17 +150,17 @@ def main(plot_month):
         
         # Sort ticklabels.
         if i in [0, 1]:
-           gl.xlabels_top=True
-           gl.xlabels_bottom=False
+           gl.top_labels=False
+           gl.bottom_labels=False
         else:
-           gl.xlabels_top=False 
-           gl.xlabels_bottom=True
+           gl.top_labels=False 
+           gl.bottom_labels=True
         if i in [0, 2]:
-           gl.ylabels_left=True
-           gl.ylabels_right=False
+           gl.left_labels=True
+           gl.right_labels=False
         else:
-           gl.ylabels_left=False
-           gl.ylabels_right=True
+           gl.left_labels=False
+           gl.right_labels=False
     
     # Add colorbars.
     cba = axgr.cbar_axes[0].colorbar(plots['abs'], 
@@ -171,7 +171,7 @@ def main(plot_month):
                                      label='SST diurnal range difference (K)')
     
     # Add over all title.
-    fig.suptitle('SST diurnal range, ' + plot_month)
+    fig.suptitle('SST diurnal range, ' + plot_month + '\n ')
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
