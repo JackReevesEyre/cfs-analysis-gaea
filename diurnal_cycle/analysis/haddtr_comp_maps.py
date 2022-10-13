@@ -67,23 +67,23 @@ def main(plot_month):
     dtr_diff = dsm['RANGE'] - dtro.data
     plot_data = [
         {'data':dsm['RANGE'],
-         'title':'CFSm501 interpolated\nSST diurnal range, ' + plot_month,
+         'title':'CFSm501 interpolated',
          'colb':'abs',
          'grid':'had'},
         {'data':dsr['RANGE'],
-         'title':'CFSm501 model grid\nSST diurnal range, ' + plot_month,
+         'title':'CFSm501 model grid',
          'colb':'abs',
          'grid':'mom'},
         {'data':dtro,
-         'title':'HadDTR observations\nSST diurnal range, ' + plot_month,
+         'title':'HadDTR observations',
          'colb':'abs',
          'grid':'had'},
         {'data':dtr_diff,
-         'title':'CFSm501 minus HadDTR\nSST diurnal range, ' + plot_month,
+         'title':'CFSm501 minus HadDTR',
          'colb':'diff',
          'grid':'had'}
     ]
-    
+    import pdb; pdb.set_trace()
     #-----------
     # Plot maps.
     
@@ -126,10 +126,10 @@ def main(plot_month):
         # Add features.
         ax.set_global()
         gl = ax.gridlines(draw_labels=True,
+                          ylabel_style={'rotation':45.0},
                           xlocs=np.arange(-300, 151, 60),
                           ylocs=np.arange(-90, 91, 30),
                           linewidths=0.3)
-        gl.right_labels = True
         gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                            degree_symbol='')
         gl.yformatter = LatitudeFormatter(degree_symbol='')
@@ -150,25 +150,30 @@ def main(plot_month):
         
         # Sort ticklabels.
         if i in [0, 1]:
-            ax.xaxis.set_tick_params(which='both', labelrotation=45,
-                                     labelbottom=False, labeltop=True)
+           gl.xlabels_top=True
+           gl.xlabels_bottom=False
         else:
-            ax.xaxis.set_tick_params(which='both', labelrotation=45,
-                                     labelbottom=True, labeltop=False)
+           gl.xlabels_top=False 
+           gl.xlabels_bottom=True
         if i in [0, 2]:
-            ax.yaxis.set_tick_params(which='both',
-                                     labelleft=True, labelright=False)
+           gl.ylabels_left=True
+           gl.ylabels_right=False
         else:
-            ax.yaxis.set_tick_params(which='both',
-                                     labelleft=False, labelright=True)
-
+           gl.ylabels_left=False
+           gl.ylabels_right=True
+    
     # Add colorbars.
     cba = axgr.cbar_axes[0].colorbar(plots['abs'], 
-                                     pad=0.25, 
+                                     pad=0.35, shrink=0.6, aspect=10,
+                                     extend='max',
                                      label='SST diurnal range (K)')
     cbd = axgr.cbar_axes[1].colorbar(plots['diff'], 
-                                     pad=0.25,
+                                     pad=0.35, shrink=0.6, aspect=10,
+                                     extend='both',
                                      label='SST diurnal range difference (K)')
+    
+    # Add over all title.
+    fig.suptitle('SST diurnal range, ' + plot_month)
     
     # Save file.
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
