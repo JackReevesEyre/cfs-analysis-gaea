@@ -126,7 +126,7 @@ def main(plot_month):
         # Add features.
         ax.set_global()
         gl = ax.gridlines(draw_labels=True,
-                          xlabel_style={'rotation':45.0},
+                          xlabel_style={'rotation':-45.0},
                           xlocs=np.arange(-300, 151, 60),
                           ylocs=np.arange(-90, 91, 30),
                           linewidths=0.3)
@@ -160,7 +160,7 @@ def main(plot_month):
            gl.right_labels=False
         else:
            gl.left_labels=False
-           gl.right_labels=False
+           gl.right_labels=True
     
     # Add colorbars.
     cba = axgr.cbar_axes[0].colorbar(plots['abs'], 
