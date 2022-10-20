@@ -103,6 +103,7 @@ def main(plot_month, plot_var, plot_type):
             xr.set_options(keep_attrs=False)
             ds.attrs['input_files'] = file_list
             ds_var = 'U_streamwise'
+            thresh_depth = 0.02 # m s-1
         elif plot_var == 'TEMP':
             file_list = get_filelist('ocn', plot_month, ddir)
             ds = xr.open_mfdataset(file_list, chunks=ocn_chunks)[['temp']]
@@ -110,6 +111,7 @@ def main(plot_month, plot_var, plot_type):
             ds = ds.mean(dim='time', keep_attrs=True)
             ds.attrs['input_files'] = file_list
             ds_var = 'temp'
+            thresh_depth = 0.1 # K
         else:
             sys.exit('plot_var not recognized.')
          
@@ -133,6 +135,9 @@ def main(plot_month, plot_var, plot_type):
             iHALF = (RANGE_3D >= 0.5*RANGE_3D.isel(st_ocean=0))\
                 .cumprod(dim='st_ocean').sum(dim='st_ocean') - 1
             iHALF = iHALF.where(iHALF >= 0, other=0)
+            iTHRESH = (RANGE_3D >= thresh_depth)\
+                .cumprod(dim='st_ocean').sum(dim='st_ocean') - 1
+            iTHRESH = iTHRESH.where(iTHRESH >= 0, other=0)
             ds['RANGE'] = RANGE_3D.isel(st_ocean=0)*nan_hr_mask
             ds['PHASE'] = PHASE_3D.isel(st_ocean=0)*nan_hr_mask
             ds['RANGE_25'] = RANGE_3D.sel(st_ocean=25.0)*nan_hr_mask
@@ -140,8 +145,11 @@ def main(plot_month, plot_var, plot_type):
             ds['HALF_DEPTH'] = ds.st_ocean[iHALF]*nan_hr_mask
             ds['PHASE_DELAY'] = (PHASE_3D.isel(st_ocean=iHALF) 
                                  - PHASE_3D.isel(st_ocean=0))*nan_hr_mask % 24
+            ds['THRESH_DEPTH'] = ds.st_ocean[iTHRESH]*nan_hr_mask
+            ds['THRESH_DELAY'] = (PHASE_3D.isel(st_ocean=iTHRESH)
+                                  - PHASE_3D.isel(st_ocean=0))*nan_hr_mask % 24
             ds_out = ds[['RANGE', 'PHASE', 'HALF_DEPTH', 'PHASE_DELAY',
-                         'RANGE_25', 'PHASE_25']]
+                         'RANGE_25', 'PHASE_25', 'THRESH_DEPTH', 'THRESH_DELAY']]
         else:
             ds['RANGE'] = (ds[ds_var].max(dim='hour') 
                            - ds[ds_var].min(dim='hour')).compute()*nan_hr_mask
@@ -189,6 +197,20 @@ def main(plot_month, plot_var, plot_type):
             }
             ds_out['PHASE_25'].attrs = {
                 'long_name':'local time of diurnal cycle maximum at 25 m depth',
+                'units':'hours',
+                'variable':ds[ds_var].attrs['long_name'],
+                'cell_methods':month_str + ' mean over years & months for each hour of day ; (max - min) over hours of day.',
+                'time_period':month_str + ' 2002-2005'
+            }
+            ds_out['THRESH_DEPTH'].attrs = {
+                'long_name':'deepest level at which range of mean diurnal cycle is >= ' + str(thresh_depth),
+                'units':'m',
+                'variable':ds[ds_var].attrs['long_name'],
+                'cell_methods':month_str +  ' mean over years & months for each hour of day; (max - min) over hours of day; deepest grid level i such that range[i] >=' + str(thresh_depth) + ' ' + ds[ds_var].attrs['units'],
+                'time_period':month_str + ' 2002-2005'
+            }
+            ds_out['THRESH_DELAY'].attrs = {
+                'long_name':'delay of time of diurnal cycle maximum at THRESH_DEPTH after maximum at surface',
                 'units':'hours',
                 'variable':ds[ds_var].attrs['long_name'],
                 'cell_methods':month_str + ' mean over years & months for each hour of day ; (max - min) over hours of day.',
@@ -385,7 +407,17 @@ def plot_dets(vn, att, pty=None):
 	    'maxPHASE_DELAY':6.0,
 	    'stepPHASE_DELAY':0.5,
 	    'cmapPHASE_DELAY':'magma',
-	    'unitsPHASE_DELAY':'hours'
+	    'unitsPHASE_DELAY':'hours',
+            'minTHRESH_DEPTH':0.0,
+            'maxTHRESH_DEPTH':20.0,
+            'stepTHRESH_DEPTH':2.0,
+            'cmapTHRESH_DEPTH':'magma',
+            'unitsTHRESH_DEPTH':'m',
+            'minTHRESH_DELAY':0.0,
+            'maxTHRESH_DELAY':6.0,
+            'stepTHRESH_DELAY':0.5,
+            'cmapTHRESH_DELAY':'magma',
+            'unitsTHRESH_DELAY':'hours'
 
 	},
         'CUR':{
@@ -422,7 +454,17 @@ def plot_dets(vn, att, pty=None):
             'maxPHASE_DELAY':6.0,
             'stepPHASE_DELAY':0.5,
             'cmapPHASE_DELAY':'magma',
-            'unitsPHASE_DELAY':'hours'
+            'unitsPHASE_DELAY':'hours',
+            'minTHRESH_DEPTH':0.0,
+            'maxTHRESH_DEPTH':20.0,
+            'stepTHRESH_DEPTH':2.0,
+            'cmapTHRESH_DEPTH':'magma',
+            'unitsTHRESH_DEPTH':'m',
+            'minTHRESH_DELAY':0.0,
+            'maxTHRESH_DELAY':6.0,
+            'stepTHRESH_DELAY':0.5,
+            'cmapTHRESH_DELAY':'magma',
+            'unitsTHRESH_DELAY':'hours'
 
         }
     }
