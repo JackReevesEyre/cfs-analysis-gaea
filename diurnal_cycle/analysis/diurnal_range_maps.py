@@ -205,6 +205,7 @@ def main(plot_month, plot_var, plot_type):
             ds_out['THRESH_DEPTH'].attrs = {
                 'long_name':'deepest level at which range of mean diurnal cycle is >= ' + str(thresh_depth),
                 'units':'m',
+                'threshold':str(thresh_depth) + ' ' + ds[ds_var].attrs['units'],
                 'variable':ds[ds_var].attrs['long_name'],
                 'cell_methods':month_str +  ' mean over years & months for each hour of day; (max - min) over hours of day; deepest grid level i such that range[i] >=' + str(thresh_depth) + ' ' + ds[ds_var].attrs['units'],
                 'time_period':month_str + ' 2002-2005'
@@ -212,6 +213,7 @@ def main(plot_month, plot_var, plot_type):
             ds_out['THRESH_DELAY'].attrs = {
                 'long_name':'delay of time of diurnal cycle maximum at THRESH_DEPTH after maximum at surface',
                 'units':'hours',
+                'threshold':str(thresh_depth) + ' ' + ds[ds_var].attrs['units'],
                 'variable':ds[ds_var].attrs['long_name'],
                 'cell_methods':month_str + ' mean over years & months for each hour of day ; (max - min) over hours of day.',
                 'time_period':month_str + ' 2002-2005'
@@ -295,8 +297,12 @@ def plot_one_map(ds, ptype, pvar, mon):
                           cmap=cmap_b, norm=norm_b, shading='nearest')
     
     # Finish up figure.
-    ax.set_title(plot_dets(pvar, 'plotname') + ' DIURNAL CYCLE ' + ptype
-                 + ', ' + mon)
+    if ptype in ['THRESH_DEPTH', 'THRESH_DELAY']:
+        ax.set_title(plot_dets(pvar, 'plotname') + ' DIURNAL CYCLE ' + ptype 
+                     + ', ' + mon + '\nthreshold: ' + ds[ptype].attrs['threshold'])
+    else:
+        ax.set_title(plot_dets(pvar, 'plotname') + ' DIURNAL CYCLE ' + ptype
+                     + ', ' + mon)
     fig.colorbar(p,
                  label=ptype + ' (' + plot_dets(pvar, 'units', ptype) + ')',
                  ax=ax, orientation='horizontal',shrink=0.5)
