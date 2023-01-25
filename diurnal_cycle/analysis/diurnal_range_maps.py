@@ -462,13 +462,13 @@ def plot_dets(vn, att, pty=None):
             'cmapPHASE_DELAY':'magma',
             'unitsPHASE_DELAY':'hours',
             'minTHRESH_DEPTH':0.0,
-            'maxTHRESH_DEPTH':20.0,
-            'stepTHRESH_DEPTH':2.0,
+            'maxTHRESH_DEPTH':40.0,
+            'stepTHRESH_DEPTH':4.0,
             'cmapTHRESH_DEPTH':'magma',
             'unitsTHRESH_DEPTH':'m',
             'minTHRESH_DELAY':0.0,
-            'maxTHRESH_DELAY':6.0,
-            'stepTHRESH_DELAY':0.5,
+            'maxTHRESH_DELAY':24.0,
+            'stepTHRESH_DELAY':2.0,
             'cmapTHRESH_DELAY':'magma',
             'unitsTHRESH_DELAY':'hours'
 
