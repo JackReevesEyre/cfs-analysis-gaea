@@ -383,7 +383,7 @@ def plot_dets(vn, att, pty=None):
             'mask_lim':0.1,
 	    'latname':'geolat_t',
 	    'lonname':'geolon_t',
-	    'plotname':'SST',
+	    'plotname':'TEMPERATURE',
 	    'minRANGE':0.0,
 	    'maxRANGE':1.0,
 	    'stepRANGE':0.1,
