@@ -123,13 +123,11 @@ def main(plot_var, plot_month1, plot_month2):
         else:
             gl.top_labels = False
             gl.bottom_labels = True
-        if i < 4:
-            gl.left_labels = True
-        else:
-            gl.left_labels = False
+        gl.left_labels = True
         gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                            degree_symbol='')
-        plt.xticks(rotation='vertical')
+        gl.xlabel_style = {'size':8}
+        gl.ylabel_style = {'size':8}
         gl.yformatter = LatitudeFormatter(degree_symbol='')
         ax.coastlines(zorder=5)
         ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
@@ -165,7 +163,7 @@ def main(plot_var, plot_month1, plot_month2):
     
         # Titles.
         if ptype in ['RANGE']:
-            ax.set_title(plot_dets(plot_var, 'plotname') + ' | ' + mon)
+            ax.set_title(plot_dets(plot_var, 'plotname') + ', ' + mon)
         else:
             pass
 
@@ -179,10 +177,10 @@ def main(plot_var, plot_month1, plot_month2):
                          ' (' + plot_dets(plot_var, 'units', ptype) + ')')
         
         # Add figure letters (a, b, c, etc.).
-        ax.text(-0.4, 0.4, fig_letters[i],
+        ax.text(0.1, 0.9, fig_letters[i],
                 transform=ax.transAxes,
                 horizontalalignment='center', verticalalignment='center',
-                bbox={'facecolor':'white', 'alpha':0.9, 'pad':0.5,
+                bbox={'facecolor':'white', 'alpha':0.9, 'pad':0.1,
                       'boxstyle':'round'})
     
     # Save file.
