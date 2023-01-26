@@ -117,7 +117,12 @@ def main(plot_var, plot_month1, plot_month2):
                           xlocs=np.arange(-300, 151, 60),
                           ylocs=np.arange(-90, 91, 30),
                           linewidths=0.3)
-        gl.right_labels = True
+        if i in [0,4]:
+            gl.top_labels = True
+            gl.bottom_labels = True
+        else:
+            gl.top_labels = False
+            gl.bottom_labels = True
         gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                            degree_symbol='')
         gl.yformatter = LatitudeFormatter(degree_symbol='')
@@ -154,22 +159,23 @@ def main(plot_var, plot_month1, plot_month2):
                               cmap=cmap_b, norm=norm_b, shading='nearest')
     
         # Titles.
-        if ptype in ['THRESH_DEPTH', 'THRESH_DELAY']:
-            ax.set_title(plot_dets(plot_var, 'plotname') + ' DIURNAL CYCLE ' + ptype 
-                         + ', ' + mon +
-                         '\nthreshold: ' + ds[ptype].attrs['threshold'])
+        if ptype in ['RANGE']:
+            ax.set_title(plot_dets(plot_var, 'plotname') + ' | ' + mon)
         else:
-            ax.set_title(plot_dets(plot_var, 'plotname') + ' DIURNAL CYCLE ' + ptype
-                         + ', ' + mon)
+            pass
+
         # Colorbars.
-        cb = axgr.cbar_axes[i].colorbar(p)
-        cb.set_label(ptype +
-                     ' (' + plot_dets(plot_var, 'units', ptype) + ')')
+        if i < 4:
+            pass
+        else:
+            cb = axgr.cbar_axes[i].colorbar(p)
+            cb.set_label(ptype +
+                         ' (' + plot_dets(plot_var, 'units', ptype) + ')')
         
         # Add figure letters (a, b, c, etc.).
-        ax.text(120.0, -82.0, fig_letters[i],
+        ax.text(90.0, 50.0, fig_letters[i],
                 horizontalalignment='center',
-                bbox={'facecolor':'white', 'alpha':0.9, 'pad':2,
+                bbox={'facecolor':'white', 'alpha':0.9, 'pad':0.5,
                       'boxstyle':'round'})
     
     # Save file.
