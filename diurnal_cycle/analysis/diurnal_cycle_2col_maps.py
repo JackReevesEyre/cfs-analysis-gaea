@@ -123,8 +123,13 @@ def main(plot_var, plot_month1, plot_month2):
         else:
             gl.top_labels = False
             gl.bottom_labels = True
+        if i < 4:
+            gl.left_labels = True
+        else:
+            gl.left_labels = False
         gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                            degree_symbol='')
+        plt.xticks(rotation='vertical')
         gl.yformatter = LatitudeFormatter(degree_symbol='')
         ax.coastlines(zorder=5)
         ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
@@ -166,15 +171,17 @@ def main(plot_var, plot_month1, plot_month2):
 
         # Colorbars.
         if i < 4:
-            pass
+            cb = axgr.cbar_axes[i].colorbar(p)
+            cb.remove()
         else:
             cb = axgr.cbar_axes[i].colorbar(p)
             cb.set_label(ptype +
                          ' (' + plot_dets(plot_var, 'units', ptype) + ')')
         
         # Add figure letters (a, b, c, etc.).
-        ax.text(90.0, 50.0, fig_letters[i],
-                horizontalalignment='center',
+        ax.text(-0.4, 0.4, fig_letters[i],
+                transform=ax.transAxes,
+                horizontalalignment='center', verticalalignment='center',
                 bbox={'facecolor':'white', 'alpha':0.9, 'pad':0.5,
                       'boxstyle':'round'})
     
