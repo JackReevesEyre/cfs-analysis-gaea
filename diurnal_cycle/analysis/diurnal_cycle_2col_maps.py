@@ -62,8 +62,10 @@ def main(plot_var, plot_month1, plot_month2):
     # Convert all velocities to cm s-1.
     if plot_var == 'CUR':
         for v in ['RANGE', 'RANGE_25']:
-            ds[v] = ds[v]*100.0
-            ds[v].attrs['units'] = 'cm s-1'
+            ds1[v] = ds1[v]*100.0
+            ds1[v].attrs['units'] = 'cm s-1'
+            ds2[v] = ds2[v]*100.0
+            ds2[v].attrs['units'] = 'cm s-1'
     
     #----------------------------------------------------------------------------
     # Plot figure.
@@ -117,12 +119,12 @@ def main(plot_var, plot_month1, plot_month2):
                           xlocs=np.arange(-300, 151, 60),
                           ylocs=np.arange(-90, 91, 30),
                           linewidths=0.3)
-        if i in [0,4]:
-            gl.top_labels = True
+        if i in [3, 7]:
+            gl.top_labels = False
             gl.bottom_labels = True
         else:
             gl.top_labels = False
-            gl.bottom_labels = True
+            gl.bottom_labels = False
         gl.left_labels = True
         gl.xformatter = LongitudeFormatter(zero_direction_label=False,
                                            degree_symbol='')
