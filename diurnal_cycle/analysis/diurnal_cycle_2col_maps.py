@@ -59,6 +59,12 @@ def main(plot_var, plot_month1, plot_month2):
     ds1 = xr.open_dataset(ddir + dicy_fn1, decode_timedelta=False)
     ds2 = xr.open_dataset(ddir + dicy_fn2, decode_timedelta=False)
 
+    # Add PHASE in UTC.
+    print('WARNING: converting PHASE to UTC.')
+    local_m_utc = approx_local_time(ds1)
+    ds1['PHASE'] = (ds1['PHASE'] - local_m_utc) % 24
+    ds2['PHASE'] = (ds2['PHASE'] - local_m_utc) % 24
+
     # Convert all velocities to cm s-1.
     if plot_var == 'CUR':
         for v in ['RANGE', 'RANGE_25']:
@@ -175,8 +181,12 @@ def main(plot_var, plot_month1, plot_month2):
             cb.remove()
         else:
             cb = axgr.cbar_axes[i].colorbar(p)
-            cb.set_label(ptype +
-                         ' (' + plot_dets(plot_var, 'units', ptype) + ')')
+            if ptype == 'PHASE':
+                cbl = 'PHASE (UTC)'
+            else:
+                cbl = ptype + \
+                    ' (' + plot_dets(plot_var, 'units', ptype) + ')'
+            cb.set_label(cbl) 
         
         # Add figure letters (a, b, c, etc.).
         ax.text(0.1, 1.0, fig_letters[i],
