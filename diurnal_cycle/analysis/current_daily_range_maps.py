@@ -94,7 +94,7 @@ def main(plot_date, plot_var):
     # Finish up figure.
     ax.set_title(plot_title)
     fig.colorbar(p,
-                 label=plot_dets(plot_var, 'plotname') + ' (' +
+                 label='diurnal range (' +
 		     plot_dets(plot_var, 'units') + ')',
                  extend='max',
                  ax=ax, orientation='horizontal',shrink=0.5)
