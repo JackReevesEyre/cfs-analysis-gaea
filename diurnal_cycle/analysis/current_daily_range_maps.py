@@ -137,8 +137,8 @@ def plot_dets(vn, att):
 	    'lonname':'geolon_c',
 	    'plotname':'eastward current',
 	    'min':0.0,
-	    'max':30.0,
-	    'step':2.0,
+	    'max':50.0,
+	    'step':5.0,
 	    'units':'cm s-1',
 	    'cmap':'magma'
 	},
