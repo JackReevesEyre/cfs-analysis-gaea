@@ -77,7 +77,7 @@ def main(plot_date, plot_var):
     ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
     
     # Define color map.
-    cmap_b = plt.get_cmap('BrBG')
+    cmap_b = plt.get_cmap(plot_dets(plot_var, 'cmap'))
     norm_b = colors.BoundaryNorm(
         np.arange(plot_dets(plot_var, 'min'),
                   plot_dets(plot_var, 'max')*1.01,

@@ -160,8 +160,8 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'eastward current',
-	    'min':-30.0,
-	    'max':30.0,
+	    'min':-50.0,
+	    'max':50.0,
 	    'step':5.0,
 	    'units':'cm s-1',
 	    'cmap':'BrBg'
