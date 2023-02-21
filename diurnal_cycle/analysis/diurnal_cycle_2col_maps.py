@@ -180,7 +180,9 @@ def main(plot_var, plot_month1, plot_month2):
             cb = axgr.cbar_axes[i].colorbar(p)
             cb.remove()
         else:
-            cb = axgr.cbar_axes[i].colorbar(p)
+            cb = axgr.cbar_axes[i].colorbar(
+                p, extend=plot_dets(plot_var, 'extend', ptype)
+            )
             if ptype == 'PHASE':
                 cbl = 'PHASE (UTC)'
             else:

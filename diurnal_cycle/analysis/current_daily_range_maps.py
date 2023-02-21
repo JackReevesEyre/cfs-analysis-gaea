@@ -96,6 +96,7 @@ def main(plot_date, plot_var):
     fig.colorbar(p,
                  label=plot_dets(plot_var, 'plotname') + ' (' +
 		     plot_dets(plot_var, 'units') + ')',
+                 extend='max',
                  ax=ax, orientation='horizontal',shrink=0.5)
     
     # Save file.
@@ -135,21 +136,21 @@ def plot_dets(vn, att):
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'eastward current',
-	    'min':-10.0,
-	    'max':10.0,
+	    'min':0.0,
+	    'max':30.0,
 	    'step':2.0,
 	    'units':'cm s-1',
-	    'cmap':'BrBg'
+	    'cmap':'magma'
 	},
         'v':{
 	    'latname':'geolat_c',
 	    'lonname':'geolon_c',
 	    'plotname':'northward current',
-	    'min':-30.0,
+	    'min':0.0,
 	    'max':30.0,
-	    'step':5.0,
+	    'step':2.0,
 	    'units':'cm s-1',
-	    'cmap':'BrBg'
+	    'cmap':'magma'
 	}
     }
     #
