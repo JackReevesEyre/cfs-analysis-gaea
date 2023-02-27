@@ -92,27 +92,27 @@ def main(plot_month):
     axs[0].scatter(ds1_t['RANGE'], 
                    ds1_t['THRESH_DEPTH'],
                    c='red',
-                   s=0.2, marker='o', alpha=0.2,
+                   s=0.2, marker='o', alpha=0.02,
                    label='|lat| <= ' + str(trop_lim))
     axs[0].scatter(ds1_m['RANGE'],
                    ds1_m['THRESH_DEPTH'],
                    c='black',
-                   s=0.1, marker='.', alpha=0.2,
+                   s=0.1, marker='.', alpha=0.02,
                    label=str(trop_lim) + ' < |lat| < ' + str(pol_lim))
     axs[0].scatter(ds1_p['RANGE'],
                    ds1_p['THRESH_DEPTH'],
                    c='blue',
-                   s=0.2, marker='s', alpha=0.2,
+                   s=0.2, marker='s', alpha=0.02,
                    label='|lat| > ' + str(pol_lim))
     axs[1].scatter(ds2_t['RANGE'],
                    ds2_t['THRESH_DEPTH'],
                    c='red',
-                   s=0.2, marker='o', alpha=0.2,
+                   s=0.2, marker='o', alpha=0.02,
                    label='|lat| <= ' + str(trop_lim))
     axs[1].scatter(ds2_p['RANGE'],
                    ds2_p['THRESH_DEPTH'],
                    c='blue',
-                   s=0.2, marker='s', alpha=0.2,
+                   s=0.2, marker='s', alpha=0.02,
                    label='|lat| > ' + str(pol_lim))
     
     # Set plot details.
@@ -122,7 +122,7 @@ def main(plot_month):
     axs[0].set_title(month_str, loc='left')
 
     # Add legend.
-    axs[1].legend(loc='lower left', frameon=False)
+    axs[0].legend(loc='upper left', frameon=False)
 
     # Add figure letters (a, b, c, etc.).
     axs[0].text(0.1, 0.9, fig_letters[0],
