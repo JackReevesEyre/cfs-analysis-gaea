@@ -100,6 +100,10 @@ def main(plot_month):
                   '|lat| > ' + str(pol_lim)]
     axno_list = [0, 0, 0, 1, 1]
     bin_width_list = [0.05, 0.05, 0.05, 1.0, 1.0]
+    xcl = []
+    yml = []
+    y5l = []
+    y95l = []
 
     # Plot data.
     for ids, ds in enumerate(ds_list):
@@ -107,10 +111,15 @@ def main(plot_month):
             bin_stats(ds['RANGE'], ds['THRESH_DEPTH'], 
                       bin_width=bin_width_list[ids], 
                       bin_min_count=20)
+        xcl.append(ds_xcenters)
+        yml.append(ds_ymedians)
+        y5l.append(ds_y5p)
+        y95l.append(ds_y95p)
+        import pdb; pdb.set_trace()
         axs[axno_list[ids]].errorbar(
-            ds_xcenters, ds_ymedians,
-            yerr=[ds_ymedians - ds_y5p,
-                  ds_ymedians + ds_y95p],
+            xcl[ids], yml[ids],
+            yerr=[yml[ids] - y5l[ids],
+                  yml[ids] + y95l[ids]],
             fmt='None', ecolor=col_list[ids],
             label=label_list[ids]
         )
@@ -178,13 +187,13 @@ def bin_stats(x, y, bin_width=1.0, bin_min_count=20):
     bin_c = 0.5*(bin_edges[:-1] + bin_edges[1:])
     bin_m = np.nan*np.zeros(len(bin_c))
     bin_5 = np.nan*np.zeros(len(bin_c))
-    bin_95 = np.nan*np.zeros(len(bin_c))
+    bin_95 = np.nan*np.zeros(len(bin_c)) 
     for i_b in range(len(bin_c)):
         quants = np.nanquantile(
             y.where((x >= bin_edges[i_b]) &
                     (x < bin_edges[i_b + 1])),
             np.array([0.05, 0.5, 0.95])
-        )
+        ) 
         count = np.sum(~np.isnan(
             y.where((x >= bin_edges[i_b]) &
               (x < bin_edges[i_b + 1]))
