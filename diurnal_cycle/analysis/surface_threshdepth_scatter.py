@@ -87,14 +87,40 @@ def main(plot_month):
     ds2_m = ds2.where((np.abs(ds2.geolat_c) > trop_lim) &
                       (np.abs(ds2.geolat_c) < pol_lim), other=np.nan)
     ds2_p = ds2.where(np.abs(ds2.geolat_c) >= pol_lim, other=np.nan)
-    
+
+    # Define details by dataset.
+    ds_list = [ds1_t, ds1_m, ds1_p, ds2_t, ds2_p]
+    col_list = ['red', 'black', 'blue', 'red', 'blue']
+    size_list = [0.2, 0.1, 0.2, 0.2, 0.2]
+    marker_list = ['o', '.', 's', 'o', 's']
+    label_list = ['|lat| <= ' + str(trop_lim),
+                  str(trop_lim) + ' < |lat| < ' + str(pol_lim),
+                  '|lat| > ' + str(pol_lim),
+                  '|lat| <= ' + str(trop_lim),
+                  '|lat| > ' + str(pol_lim)]
+    axno_list = [0, 0, 0, 1, 1]
+    bin_width_list = [0.05, 0.05, 0.05, 1.0, 1.0]
+
     # Plot data.
+    for ids, ds in enumerate(ds_list):
+        ds_xcenters, ds_ymedians, ds_y5p, ds_y95p = \
+            bin_stats(ds['RANGE'], ds['THRESH_DEPTH'], 
+                      bin_width=bin_width_list[ids], 
+                      bin_min_count=20)
+        axs[axno_list[ids]].errorbar(
+            ds_xcenters, ds_ymedians,
+            yerr=[ds_ymedians - ds_y5p,
+                  ds_ymedians + ds_y95p],
+            fmt='None', ecolor=col_list[ids],
+            label=label_list[ids]
+        )
+    """
     axs[0].scatter(ds1_t['RANGE'], 
                    ds1_t['THRESH_DEPTH'],
                    c='red',
                    s=0.2, marker='o', alpha=0.02,
                    label='|lat| <= ' + str(trop_lim))
-    """axs[0].scatter(ds1_m['RANGE'],
+    axs[0].scatter(ds1_m['RANGE'],
                    ds1_m['THRESH_DEPTH'],
                    c='black',
                    s=0.1, marker='.', alpha=0.02,
@@ -103,13 +129,13 @@ def main(plot_month):
                    ds1_p['THRESH_DEPTH'],
                    c='blue',
                    s=0.2, marker='s', alpha=0.02,
-                   label='|lat| > ' + str(pol_lim))"""
+                   label='|lat| > ' + str(pol_lim))
     axs[1].scatter(ds2_t['RANGE'],
                    ds2_t['THRESH_DEPTH'],
                    c='red',
                    s=0.2, marker='o', alpha=0.02,
                    label='|lat| <= ' + str(trop_lim))
-    """axs[1].scatter(ds2_p['RANGE'],
+    axs[1].scatter(ds2_p['RANGE'],
                    ds2_p['THRESH_DEPTH'],
                    c='blue',
                    s=0.2, marker='s', alpha=0.02,
@@ -144,6 +170,31 @@ def main(plot_month):
                 dpi=400)
     #
     return
+
+
+def bin_stats(x, y, bin_width=1.0, bin_min_count=20):
+    bin_edges = np.arange(0.0, np.ceil(np.nanmax(x)) + 0.0001,
+                          bin_width)
+    bin_c = 0.5*(bin_edges[:-1] + bin_edges[1:])
+    bin_m = np.nan*np.zeros(len(bin_c))
+    bin_5 = np.nan*np.zeros(len(bin_c))
+    bin_95 = np.nan*np.zeros(len(bin_c))
+    for i_b in range(len(bin_c)):
+        quants = np.nanquantile(
+            y.where((x >= bin_edges[i_b]) &
+                    (x < bin_edges[i_b + 1])),
+            np.array([0.05, 0.5, 0.95])
+        )
+        count = np.sum(~np.isnan(
+            y.where((x >= bin_edges[i_b]) &
+              (x < bin_edges[i_b + 1]))
+        ))
+        if count >= bin_min_count:
+            bin_5[i_b] = quants[0]
+            bin_m[i_b] = quants[1]
+            bin_95[i_b] = quants[2]
+    #
+    return bin_c, bin_m, bin_5, bin_95
 
 
 if __name__ == "__main__": 
