@@ -119,8 +119,8 @@ def main(plot_month):
         axs[axno_list[ids]].errorbar(
             xcl[ids], yml[ids],
             yerr=[yml[ids] - y5l[ids],
-                  yml[ids] + y95l[ids]],
-            fmt='None', ecolor=col_list[ids],
+                  y95l[ids] - yml[ids]],
+            fmt=col_list[ids][0] + 'x', ecolor=col_list[ids],
             label=label_list[ids]
         )
     """
