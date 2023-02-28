@@ -120,7 +120,7 @@ def main(plot_month):
                 xcl[ids], yml[ids],
                 yerr=[yml[ids] - y5l[ids],
                       y95l[ids] - yml[ids]],
-                fmt='none', ecolor=col_list[ids],
+                fmt='r.', ecolor=col_list[ids],
                 label=label_list[ids]
             )
     """
