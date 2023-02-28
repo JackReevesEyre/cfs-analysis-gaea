@@ -106,7 +106,7 @@ def main(plot_month):
     y95l = []
 
     # Plot data.
-    for ids, ds in enumerate(ds_list):
+    for ids, ds in enumerate(ds_list): 
         ds_xcenters, ds_ymedians, ds_y5p, ds_y95p = \
             bin_stats(ds['RANGE'], ds['THRESH_DEPTH'], 
                       bin_width=bin_width_list[ids], 
@@ -114,15 +114,15 @@ def main(plot_month):
         xcl.append(ds_xcenters)
         yml.append(ds_ymedians)
         y5l.append(ds_y5p)
-        y95l.append(ds_y95p)
-        import pdb; pdb.set_trace()
-        axs[axno_list[ids]].errorbar(
-            xcl[ids], yml[ids],
-            yerr=[yml[ids] - y5l[ids],
-                  y95l[ids] - yml[ids]],
-            fmt=col_list[ids][0] + 'x', ecolor=col_list[ids],
-            label=label_list[ids]
-        )
+        y95l.append(ds_y95p) 
+        if ids in [0,3]:
+            axs[axno_list[ids]].errorbar(
+                xcl[ids], yml[ids],
+                yerr=[yml[ids] - y5l[ids],
+                      y95l[ids] - yml[ids]],
+                fmt='none', ecolor=col_list[ids],
+                label=label_list[ids]
+            )
     """
     axs[0].scatter(ds1_t['RANGE'], 
                    ds1_t['THRESH_DEPTH'],
@@ -155,10 +155,7 @@ def main(plot_month):
     axs[0].set_ylabel('threshold depth (m)')
     axs[1].set_xlabel('along-wind current diurnal range (' + r'$cm~s^{-1}$' + ')')
     axs[0].set_title(month_str, loc='left')
-
-    # Add legend.
-    axs[0].legend(loc='upper right', frameon=False)
-
+    
     # Add figure letters (a, b, c, etc.).
     axs[0].text(0.1, 0.9, fig_letters[0],
                 transform=axs[0].transAxes,
