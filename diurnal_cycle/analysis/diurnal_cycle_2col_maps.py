@@ -198,12 +198,11 @@ def main(plot_var, plot_month1, plot_month2):
                       'boxstyle':'round'})
     
     # Save file.
-    plt.tight_layout()
     plotdir = '/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/plots/'
     plotfn = 'maps_2col_' + plot_var + '_' + month_str1 + '_' + month_str2 + '.'
     plotfileformat='png'
     plt.savefig(plotdir + plotfn + plotfileformat, format=plotfileformat,
-                dpi=400)
+                bbox_inches='tight', dpi=400)
     #
     return
 
