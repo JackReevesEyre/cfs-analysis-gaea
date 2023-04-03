@@ -86,6 +86,7 @@ def main(plot_month):
     
     #-----------
     # Plot maps.
+    fig_letters = 'abcdefghijklmnopqrstuvwxyz'
     
     # Set up figure and axes.
     data_crs = ccrs.PlateCarree()
@@ -161,7 +162,15 @@ def main(plot_month):
         else:
            gl.left_labels=False
            gl.right_labels=True
-    
+        
+        
+        # Add figure letters (a, b, c, etc.).
+        ax.text(0.1, 1.0, fig_letters[i],
+                transform=ax.transAxes,
+                horizontalalignment='center', verticalalignment='center',
+                bbox={'facecolor':'white', 'alpha':0.9, 'pad':0.1,
+                      'boxstyle':'round'})
+
     # Add colorbars.
     cba = axgr.cbar_axes[0].colorbar(plots['abs'], 
                                      extend='max',
