@@ -13,14 +13,14 @@ def main(plot_month):
                              [8.0, 165.0],[-2.0, 165.0],
                              [-8.0, 180.0],[0.0, 180.0],
                              [0.0, 205.0],[-2.0, 220.0],
-                             [2.0, 235.0]])
+                             [2.0, 235.0], [-8.0, 235.0]])
 
     # Load data.
     ddir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/diurnal_cycle/'
     ds_atmo = xr.open_mfdataset(ddir + "atmo_*_points_meanDiurnalCycle.nc")\
             .chunk({'time':48}).sel(height=10.0)
     ds_atmo_rec_mean = ds_atmo.mean(dim=['time','hour'], keep_attrs=True)
-    ds_ocean = xr.open_mfdataset(ddir + "ocn_*_meanDiurnalCycle.nc")\
+    ds_ocean = xr.open_mfdataset(ddir + "ocn_200[0-9]_[0-9][0-9]_meanDiurnalCycle.nc")\
             .chunk({'time':48})
     
     # Take time average (optionally for a subset of months).

@@ -25,6 +25,8 @@ def main(year, month, xy_method, var_type):
                     'lw_heat', 'swflx', 'evap', 'pme']
     elif var_type == '3D':
         var_list = ['temp', 'salt', 'u', 'v']
+    elif var_type == 'mld':
+        var_list = ['mld', 'hblt']
     else:
         sys.exit('var_type not recognized, should be in {surface, 3D}')
     
@@ -73,7 +75,7 @@ def main(year, month, xy_method, var_type):
 def get_mon_di_cy_points(yr, mn, lat_list, lon_list, max_depth,
                          select_how, interp_how, var_list):
     
-    data_dir = '/lustre/f2/dev/ncep/JieShun.Zhu/CFSm501hr/CFSm501hr1980010200/DATA/'
+    data_dir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/CFSm501hr/CFSm501hr1980010200/DATA/'
     fn_root = 'ocn_' + "{:0>4d}".format(yr) +'_' + "{:0>2d}".format(mn)
     
     # Loads all files for one month. 
@@ -107,7 +109,7 @@ def get_mon_di_cy_points(yr, mn, lat_list, lon_list, max_depth,
 
 def get_mon_di_cy_grid(yr, mn, max_depth, var_list):
     
-    data_dir = '/lustre/f2/dev/ncep/JieShun.Zhu/CFSm501hr/CFSm501hr1980010200/DATA/'
+    data_dir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/CFSm501hr/CFSm501hr1980010200/DATA/'
     fn_root = 'ocn_' + "{:0>4d}".format(yr) +'_' + "{:0>2d}".format(mn)
 
     # Loads all files for one month. 
@@ -140,7 +142,7 @@ def get_mon_di_cy_manual(yr, mn, lat_list, lon_list, max_depth,
     
     # Set up.
     var_list = ['temp', 'salt', 'u', 'v']
-    data_dir = '/lustre/f2/dev/ncep/JieShun.Zhu/CFSm501hr/CFSm501hr1980010200/DATA/'
+    data_dir = '/lustre/f2/dev/ncep/Jack.Reeveseyre/CFSm501hr/CFSm501hr1980010200/DATA/'
     time_array = np.arange(
         np.datetime64(str(yr) + '-' + "{:0>2d}".format(mn)), 
         np.datetime64(str(yr) + '-' + "{:0>2d}".format(mn)) + np.timedelta64(1,'M'), 

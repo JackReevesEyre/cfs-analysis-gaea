@@ -1,0 +1,22 @@
+<xarray.Dataset>
+Dimensions:   (time: 744, yu_ocean: 3)
+Coordinates:
+  * time      (time) object 2002-07-01 00:00:00 ... 2002-07-31 23:00:00
+    xu_ocean  float64 -20.0
+  * yu_ocean  (yu_ocean) float64 -35.0 -30.0 -25.11
+    st_ocean  float64 0.5
+    geolon_c  (yu_ocean) float32 dask.array<chunksize=(1,), meta=np.ndarray>
+    geolat_c  (yu_ocean) float32 dask.array<chunksize=(1,), meta=np.ndarray>
+Data variables:
+    u         (time, yu_ocean) float32 dask.array<chunksize=(1, 1), meta=np.ndarray>
+Attributes:
+    filename:   ocn_2002_07_01_00.nc
+    title:      MOM5ICE
+    grid_type:  regular
+    grid_tile:  N/A
+Traceback (most recent call last):
+  File "/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/analysis/current_check_point_month_timeseries.py", line 174, in <module>
+    main(ds, sys.argv[1], sys.argv[2])
+  File "/ncrc/home2/Jack.Reeveseyre/cfs-analysis/diurnal_cycle/analysis/current_check_point_month_timeseries.py", line 103, in main
+    label="{:+.2f}".format(ds.geolat_c.sel(yu_ocean=lat).data))
+TypeError: unsupported format string passed to Array.__format__
