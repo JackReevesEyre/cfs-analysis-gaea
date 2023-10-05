@@ -10,6 +10,7 @@ import os
 import re
 import xarray as xr
 import numpy as np
+import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -86,9 +87,11 @@ def main(ds_in, plot_date):
     # Set up figure and axes.
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(6, 10), sharex=True)
     ax4.set_xlabel('time')
-    ax4.set_xticks(np.arange(ds.time.min().data,
-                             ds.time.max().data + np.timedelta64(2,'h'),
-                             np.timedelta64(10, 'D')),
+    xticks = np.arange(ds.time.min().data,
+                       ds.time.max().data + np.timedelta64(2,'h'),
+                       np.timedelta64(10, 'D'))
+    ax4.set_xticks(xticks, 
+                   labels=[pd.to_datetime(dt64).strftime('%b-%d') for dt64 in xticks], 
                    minor=False)
     ax4.set_xticks(np.arange(ds.time.min().data,
                              ds.time.max().data + np.timedelta64(2,'h'),
