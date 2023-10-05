@@ -86,6 +86,14 @@ def main(ds_in, plot_date):
     # Set up figure and axes.
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(6, 10), sharex=True)
     ax4.set_xlabel('time')
+    ax4.set_xticks(np.arange(ds.time.min().data,
+                             ds.time.max().data + np.timedelta64(2,'h'),
+                             np.timedelta64(10, 'D')),
+                   minor=False)
+    ax4.set_xticks(np.arange(ds.time.min().data,
+                             ds.time.max().data + np.timedelta64(2,'h'),
+                             np.timedelta64(1, 'D')),
+                   minor=True)
 
     # Define color map.
     cmap_b = cm.get_cmap('tab10')
