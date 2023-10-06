@@ -50,8 +50,8 @@ def load_ds(plot_date):
            .sel(st_ocean=0.5, 
                 yu_ocean=[-35.0, -30.0,-25.0], 
                 yt_ocean=[-35.0, -30.0,-25.0], 
-                xu_ocean=-120.0,
-                xt_ocean=-120.0, 
+                xu_ocean=-20.0,
+                xt_ocean=-20.0, 
                 method='nearest').load()
     ds['time'] = ds.indexes['time'].to_datetimeindex()
 
